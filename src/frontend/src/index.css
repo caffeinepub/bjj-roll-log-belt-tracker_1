@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.625rem;
+        --background: 0.98 0 0;
+        --foreground: 0.145 0 0;
+        --card: 1 0 0;
+        --card-foreground: 0.145 0 0;
+        --popover: 1 0 0;
+        --popover-foreground: 0.145 0 0;
+        --primary: 0.205 0 0;
+        --primary-foreground: 0.985 0 0;
+        --secondary: 0.96 0 0;
+        --secondary-foreground: 0.205 0 0;
+        --muted: 0.96 0 0;
+        --muted-foreground: 0.556 0 0;
+        --accent: 0.96 0 0;
+        --accent-foreground: 0.205 0 0;
+        --destructive: 0.577 0.245 27.325;
+        --destructive-foreground: 0.985 0 0;
+        --border: 0.9 0 0;
+        --input: 0.9 0 0;
+        --ring: 0.708 0 0;
+        --chart-1: 0.646 0.222 41.116;
+        --chart-2: 0.6 0.118 184.704;
+        --chart-3: 0.398 0.07 227.392;
+        --chart-4: 0.828 0.189 84.429;
+        --chart-5: 0.769 0.188 70.08;
+        
+        /* BJJ-specific colors */
+        --bjj-blue: 0.55 0.18 240;
+        --bjj-purple: 0.50 0.20 290;
+        --bjj-brown: 0.45 0.10 40;
+    }
+
+    .dark {
+        --background: 0.145 0 0;
+        --foreground: 0.985 0 0;
+        --card: 0.18 0 0;
+        --card-foreground: 0.985 0 0;
+        --popover: 0.22 0 0;
+        --popover-foreground: 0.985 0 0;
+        --primary: 0.90 0 0;
+        --primary-foreground: 0.145 0 0;
+        --secondary: 0.25 0 0;
+        --secondary-foreground: 0.985 0 0;
+        --muted: 0.25 0 0;
+        --muted-foreground: 0.708 0 0;
+        --accent: 0.30 0 0;
+        --accent-foreground: 0.985 0 0;
+        --destructive: 0.60 0.22 27;
+        --destructive-foreground: 0.985 0 0;
+        --border: 0.30 0 0;
+        --input: 0.30 0 0;
+        --ring: 0.556 0 0;
+        --chart-1: 0.55 0.18 240;
+        --chart-2: 0.50 0.20 290;
+        --chart-3: 0.45 0.10 40;
+        --chart-4: 0.65 0.15 180;
+        --chart-5: 0.70 0.18 60;
+        
+        /* BJJ-specific colors for dark mode */
+        --bjj-blue: 0.60 0.20 240;
+        --bjj-purple: 0.55 0.22 290;
+        --bjj-brown: 0.50 0.12 40;
+    }
+
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+@layer utilities {
+    .text-bjj-blue {
+        color: oklch(var(--bjj-blue));
+    }
+    .text-bjj-purple {
+        color: oklch(var(--bjj-purple));
+    }
+    .text-bjj-brown {
+        color: oklch(var(--bjj-brown));
+    }
+    .bg-bjj-blue {
+        background-color: oklch(var(--bjj-blue));
+    }
+    .bg-bjj-purple {
+        background-color: oklch(var(--bjj-purple));
+    }
+    .bg-bjj-brown {
+        background-color: oklch(var(--bjj-brown));
+    }
+    .from-bjj-blue {
+        --tw-gradient-from: oklch(var(--bjj-blue));
+    }
+    .to-bjj-purple {
+        --tw-gradient-to: oklch(var(--bjj-purple));
+    }
+    .to-bjj-brown {
+        --tw-gradient-to: oklch(var(--bjj-brown));
+    }
+}
+
+/* Heat map cell border radius override */
+.rounded-sm {
+    border-radius: 2px;
+}
+
+/* Heat map container with minimal scrollbar styling and full scrollability */
+.heat-map-container {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    
+    /* Add 2px spacing between bottom cells and scrollbar */
+    padding-bottom: 2px;
+    
+    /* Enable both horizontal and vertical scrolling */
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.dark .heat-map-container {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.heat-map-container::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.heat-map-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.heat-map-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.dark .heat-map-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.heat-map-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.dark .heat-map-container::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}

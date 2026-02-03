@@ -1,0 +1,25 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-update-the-four-belt-add-submission-controls-in-the-submission-log-the-four-selected-combobox-trigger-buttons-to-use-a-cleaner-dropdown-pattern-where-the-full-submission-options-list-live-filters-as-the-user-types-and-the-search-field-is-visually-integrated-with-the-add-submission-control-i-e-the-search-input-is-cleanly-located-in-at-the-top-of-the-dropdown-experience-rather-than-feeling-separate-from-the-trigger-apply-changes-only-to-the-selected-add-submission-controls-the-four-belt-combobox-triggers-implemented-via-frontend-src-components-submissionselectinput-tsx",
+      "featureTitle": "Update the four belt “Add submission…” controls in the Submission Log (the four selected combobox trigger buttons) to use a cleaner dropdown pattern where the full submission options list live-filters as the user types, and the search field is visually integrated with the add-submission control (i.e., the search input is cleanly located in/at the top of the dropdown experience rather than feeling separate from the trigger). Apply changes only to the selected add-submission controls (the four belt combobox triggers), implemented via frontend/src/components/SubmissionSelectInput.tsx.",
+      "files": [
+        "frontend/src/components/SubmissionSelectInput.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

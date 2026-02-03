@@ -1,0 +1,24 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Submission Log add-submission dropdowns: integrated search with live filtering",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Refine the four Submission Log belt add-submission combobox controls to use a cleaner dropdown with an integrated search field and real-time option filtering, implemented only in SubmissionSelectInput.tsx.",
+      "acceptanceCriteria": [
+        "Each belt’s add-submission control opens a dropdown that shows the complete options list by default and filters the list in real time as the user types.",
+        "The search input is presented as part of the dropdown experience in a clean, compact way (no visually awkward separation between the trigger and the search field).",
+        "The dropdown remains keyboard-accessible (type to filter, arrow keys to navigate, enter to select) and closes upon selection.",
+        "No other Submission Log elements outside the four selected add-submission controls are modified."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/SubmissionSelectInput.tsx",
+          "operation": "modify",
+          "description": "Update the existing Popover+Command-based combobox UI to a cleaner dropdown pattern with an integrated search field at the top of the dropdown surface and live filtering of the full submission list (excluding already-selected submissions). Ensure keyboard accessibility (typing filters, arrow navigation, enter selects), autofocus/interaction polish, and close-on-select behavior—without changing any other Submission Log UI or any files under frontend/src/components/ui."
+        }
+      ]
+    }
+  ]
+}

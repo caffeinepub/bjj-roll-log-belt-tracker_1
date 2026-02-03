@@ -1,0 +1,332 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 32,
+  "summary": "Roll Log & Belt Tracker is a full-stack Internet Computer (Motoko) + React web app for Brazilian Jiu-Jitsu practitioners. Users authenticate with Internet Identity, create/edit a profile (belt/stripes, optional profile picture, gym info, practitioner-since date), log training sessions (date, duration, gi/no-gi, theme, rolls, mood), view analytics (charts + GitHub-style heat maps), maintain a personal technique library with custom technique types and tags, and persist UI theme preference. The backend enforces per-principal data isolation with role-based access control and includes Caffeine blob-storage mixins/utilities for ExternalBlob handling and storage gateway maintenance.",
+  "existing_features": [
+    {
+      "id": "IF-1",
+      "title": "Internet Identity authentication (login/logout, identity persistence)",
+      "synonyms": [
+        "II auth",
+        "DFINITY AuthClient login"
+      ],
+      "description": "Provides an InternetIdentityProvider using @dfinity/auth-client to login users via Internet Identity, load stored delegations on app mount, expose login status flags, and support logout/clear of stored identity.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "Backend actor initialization with linear step tracking and debug logs",
+      "synonyms": [
+        "actor wrapper",
+        "actor handshake",
+        "init step logging"
+      ],
+      "description": "Creates anonymous or authenticated canister actors based on identity, runs an initialization handshake (_initializeAccessControlWithSecret) using a secret token from URL hash, tracks steps (auth-started → identity-retrieved → actor-creating → actor-ready), and exposes a rolling log buffer for the debug overlay.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "Role-based access control with admin bootstrap token",
+      "synonyms": [
+        "AccessControl",
+        "admin assignment",
+        "user roles"
+      ],
+      "description": "Implements user roles (admin/user/guest) and permission checks; the first non-anonymous caller can become admin if they provide the correct admin token (from env CAFFEINE_ADMIN_TOKEN). Includes APIs to query caller role, check admin status, and assign roles (admin-only).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "User profile storage and retrieval",
+      "synonyms": [
+        "profile API",
+        "getCallerUserProfile",
+        "saveCallerUserProfile"
+      ],
+      "description": "Stores a per-user UserProfile (username, beltProgress, optional profile picture, optional gym info, practitionerSince, bio/nickname, goals/milestones/achievements, themePreference). Provides query APIs to fetch caller profile or (admin/self) fetch another user profile.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "Profile creation workflow tracking (completion flags)",
+      "synonyms": [
+        "profile setup state",
+        "isProfileCreationCompleted"
+      ],
+      "description": "Tracks profile creation completion per principal (mark started/complete, and register/save operations set completion true). Exposes checkProfileStatus/startProfileCreation queries for read-only status retrieval.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Profile setup and editing UI (picture upload, gym info, practitioner-since)",
+      "synonyms": [
+        "ProfileSetup form",
+        "profile editor"
+      ],
+      "description": "A guided form for initial profile creation and later editing: upload profile picture (converted to ExternalBlob with preview), set belt/stripes (with belt image preview), add gym name/location and attempt logo detection via favicon URL, and choose practitioner-since month/year.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "Belt progress tracking and updates",
+      "synonyms": [
+        "BeltTracker",
+        "belt progress mutation"
+      ],
+      "description": "Displays current belt and stripes with belt images (preloaded for caching), allows updating belt and stripe count, persists changes via updateBeltProgress, and visually indicates progression states (completed/current/next/locked).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Training session logging (add, edit, delete, save-all)",
+      "synonyms": [
+        "training records",
+        "training log CRUD"
+      ],
+      "description": "Per-user training session storage with fields: id, date (nanoseconds), duration (minutes), gi/no-gi, session theme, rolls, and mood rating. Frontend supports adding and editing sessions via a dialog and deleting sessions by saving an updated session list.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-9",
+      "title": "Training log analytics (weekly bar chart and theme frequency pie chart)",
+      "synonyms": [
+        "session analytics",
+        "recharts dashboard"
+      ],
+      "description": "Computes and displays total sessions, unique themes, weekly activity for the last 4 weeks (sessions + rounded hours), and most practiced session themes using Recharts visualizations.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-10",
+      "title": "Training heat map (GitHub-style calendar) with per-date session details",
+      "synonyms": [
+        "TrainingHeatMap",
+        "calendar heatmap"
+      ],
+      "description": "Renders a year grid (Mon–Sun rows) using local-date formatting and ISO weekday normalization; colors cells by total training hours derived from logged sessions. Selecting a date shows sessions on that date and supports deleting individual sessions.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-11",
+      "title": "Manual training-hours tracking with heat map and backend persistence",
+      "synonyms": [
+        "TrainingHoursHeatMap",
+        "training hours overrides"
+      ],
+      "description": "Stores per-day training hour overrides in the backend keyed by YYYY-MM-DD strings; frontend combines hours derived from sessions with manual overrides, renders a year heat map, and provides an input area to set/clear hours with 0.25-hour increments and quick-select buttons.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-12",
+      "title": "Technique library (search, category filter, add technique)",
+      "synonyms": [
+        "TechniqueLibrary",
+        "technique management"
+      ],
+      "description": "Maintains a per-user collection of techniques with category (SessionTheme), type, description, link, tags, and linked sessions. UI supports searching across name/description/type/tags and filtering by category.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-13",
+      "title": "Custom technique types with creatable select",
+      "synonyms": [
+        "custom types",
+        "addCustomTechniqueType"
+      ],
+      "description": "Allows users to maintain a personal list of technique type strings and create new types from the add-technique dialog using a searchable/creatable popover command list; persists via getCustomTechniqueTypes/addCustomTechniqueType.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-14",
+      "title": "Link preview helpers for techniques (YouTube thumbnail detection)",
+      "synonyms": [
+        "YouTube preview",
+        "thumbnail generation"
+      ],
+      "description": "When adding a technique, attempts to extract a YouTube video ID from the link and show a thumbnail preview; falls back to a generic link preview UI when no thumbnail is available.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-15",
+      "title": "Theme toggle with local-first persistence and backend sync",
+      "synonyms": [
+        "dark mode",
+        "themePreference"
+      ],
+      "description": "Toggles light/dark theme instantly (next-themes + localStorage) and asynchronously persists the preference to the backend via updateThemePreference when authenticated.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-16",
+      "title": "Debug overlay for initialization and runtime status",
+      "synonyms": [
+        "DebugOverlay",
+        "init progress panel"
+      ],
+      "description": "Provides an in-app debug panel displaying actor initialization steps, progress percentage, detailed init logs, login status, actor readiness, and profile query status for troubleshooting.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-17",
+      "title": "Admin diagnostics endpoints",
+      "synonyms": [
+        "system status",
+        "admin queries"
+      ],
+      "description": "Backend exposes admin-only endpoints such as getSystemStatus, getAllTechniques, getAllBeltProgress, and training-hours aggregation endpoints for all users.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-18",
+      "title": "Caffeine blob-storage maintenance mixin endpoints",
+      "synonyms": [
+        "blob GC",
+        "storage gateways",
+        "cashier refill"
+      ],
+      "description": "Includes Caffeine storage mixins for gateway principal refresh, dead-blob listing and confirmation pruning (with forced GC trigger), blob liveness checks, certificate creation response, and cashier refill/top-up using cycles.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-19",
+      "title": "Training Heat Map month header alignment fix",
+      "synonyms": [
+        "heat map month labels",
+        "month header row alignment"
+      ],
+      "description": "Adjusts the TrainingHeatMap month header rendering so all month labels share a consistent Y position above the heat map grid (eliminating the stepped vertical drift/overlap behind the grid).",
+      "reqIds": [
+        "AR-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "IF-20",
+      "title": "Navigation restructure with combined Profile Analytics tab/page",
+      "synonyms": [
+        "ProfileAnalytics tab",
+        "combined Profile + Analytics navigation"
+      ],
+      "description": "Frontend navigation reorganized so Profile and key analytics are combined into a dedicated Profile Analytics view, while the Training Log remains the primary place for training-session-centric views. Adds/uses a ProfileAnalytics page/component and updates app routing/tab structure accordingly.",
+      "reqIds": [
+        "AR-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-four-belt-add-submission-controls-in-the-submission-log-the-four-selected-combobox-trigger-buttons-to-use-a-cleaner-dropdown-pattern-where-the-full-submission-options-list-live-filters-as-the-user-types-and-the-search-field-is-visually-integrated-with-the-add-submission-control-i-e-the-search-input-is-cleanly-located-in-at-the-top-of-the-dropdown-experience-rather-than-feeling-separate-from-the-trigger-apply-changes-only-to-the-selected-add-submission-controls-the-four-belt-combobox-triggers-implemented-via-frontend-src-components-submissionselectinput-tsx",
+      "title": "Update the four belt “Add submission…” controls in the Submission Log (the four selected combobox trigger buttons) to use a cleaner dropdown pattern where the full submission options list live-filters as the user types, and the search field is visually integrated with the add-submission control (i.e., the search input is cleanly located in/at the top of the dropdown experience rather than feeling separate from the trigger). Apply changes only to the selected add-submission controls (the four belt combobox triggers), implemented via frontend/src/components/SubmissionSelectInput.tsx.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Prevent frequent backend canister stoppages/redeploys between drafts by improving canister lifecycle handling (stable state init, reduced reliance on manual init calls) and/or adding guidance/automation for keeping cycles/uptime in Caffeine.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Stabilize auth/actor/profile initialization to prevent hangs (\"Connecting…\", \"Loading your profile…\"), including strict post-login actor creation sequencing, robust try/catch fallbacks (null/unauthorized → Profile Setup), debounce to prevent profile/setup flicker, and improved debug logging/overlay.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Revamp Training Session logging: remove training partners; add session theme selector (general themes + Open Mat) aligned with backend; week-based date navigation (Mon–Sun); duration in 0.25h increments with +/- and quick buttons; Gi/No-Gi toggle; add rolls count + mood slider; log against current belt/stripes where applicable.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Training Heat Map in Profile Analytics: year selector anchored/centered above grid; Monday→Sunday rows; correct month label anchoring to month-start column; consistent UTC/local date mapping to match training log input; theme-aware empty cell color (#ebedf0 light, #333333 dark); minimal scrollbar + spacing; instant theme recolor; reset selection/hover on year change; clickable cells show sessions with delete + proper cache invalidation.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Belt progression visuals and asset loading: completed/current/locked belt styling (locked belts faded but retain subtle belt color; next belt styled like locked with badge; 'Current' badge matches belt color) and prevent belt images reloading between pages via preloading/caching and avoiding unnecessary remounts.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Technique library updates: change category options to the general session themes; make Technique Type a searchable creatable select persisted per user; improve link field to generate thumbnail previews (e.g., YouTube).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Profile setup/editor improvements: profile picture + gym info (name/location + favicon logo via URL); rename \"Member Since\" → editable \"Practitioner Since\" (month/year only); remove \"First Session\" date; allow header profile button to open full-page Profile Setup for edits (not modal); add Cancel when editing; fix year dropdown usability (scroll/viewport); ensure mobile header still exposes profile entry (icon).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Submission Log UI refinements in Training Log: cleaner searchable dropdown(s) that filter as you type with search field integrated into the add-submission control; smaller tag chips without +/- controls; remove explicit Save button when selection is already persisted/auto-saved; keep per-belt unique submission enforcement.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "architecturalNotes": [
+    "Backend is a single Motoko actor (backend/main.mo) using per-user Maps keyed by Principal for profiles, sessions, techniques, custom technique types, and training-hours overrides.",
+    "Role-based authorization is implemented via an AccessControl module and mixed into the actor via MixinAuthorization; initialization uses a shared secret token to assign the first admin.",
+    "Frontend uses React + TanStack React Query for data fetching/caching with explicit query keys and invalidation on mutation success.",
+    "Backend calls are made through a generated canister interface actor; actor creation is wrapped by useActorWrapper which performs a linear initialization sequence and logs steps for debugging.",
+    "Dates are handled carefully in LOCAL TIME on the frontend; training session timestamps are stored as nanoseconds (BigInt) and converted consistently for heat map alignment.",
+    "UI layer uses Tailwind CSS (OKLCH tokens), shadcn/ui-style components, Recharts for charts, and sonner for toast notifications.",
+    "Theme is implemented as local-first (immediate UI update + localStorage), with asynchronous persistence to backend for authenticated users.",
+    "Blob-storage functionality is incorporated via Caffeine mixins (Storage + Mixin.mo) enabling blob liveness checks, dead-blob pruning workflows, and gateway principal management.",
+    "Frontend build template now includes custom ESLint rules to enforce app-specific constraints (e.g., disallow BigInt in React Query keys and require an InternetIdentity provider wrapper).",
+    "Investigate eliminating runtime dependency on manual backend init calls (e.g., _initializeAccessControlWithSecret) by using static/stable initialization patterns so upgrades/drafts don’t require re-init to function.",
+    "Recurring 'canister is stopped' suggests canister lifecycle/cycles management needs addressing; consider documenting/automating cycles top-up/auto-refuel or stabilizing draft canister usage to reduce downtime.",
+    "Backend profile retrieval should not Runtime.trap for common missing/unauthorized cases; prefer returning null/Result so frontend can reliably route to Profile Setup and avoid infinite loaders.",
+    "Actor initialization should be strictly sequenced post-Internet Identity login (await identity → create authenticated actor → mark ready → then run React Query profile fetch) to avoid 'Actor not available/Connection not ready' races.",
+    "Training session theme values must remain backend-compatible (Motoko variant/enum updates coordinated with frontend labels), e.g., add Open Mat support end-to-end.",
+    "Heat map date mapping requires a single canonical date-formatting strategy shared by logging + grid generation + click lookups (consistent weekday base and UTC/local choice) to prevent off-by-one day/week mismatches.",
+    "Consider static/stable initialization of access control/state to eliminate runtime dependency on _initializeAccessControlWithSecret and reduce draft redeploy fragility.",
+    "Frontend navigation/routing now includes a dedicated ProfileAnalytics page/component to consolidate profile + selected analytics views, reducing tab fragmentation."
+  ],
+  "knownIssues": [
+    "There are multiple actor hooks (useActor.ts and useActorWrapper.ts) with overlapping responsibilities; the codebase appears to primarily use useActorWrapper, leaving potential dead/duplicate code paths.",
+    "Admin/system status counters in getSystemStatus() use Map.size() for trainingSessions/techniques/trainingHours, which counts users-with-maps rather than total records; reported counts may be misleading.",
+    "useGetCallerUserProfile() treats certain authorization errors as 'no profile' (null), which can mask real permission/initialization problems and make debugging harder.",
+    "TrainingHours backend includes several overlapping APIs (set/update/add/batchSet/batchUpdate/delete/clearAll); only a subset is used by the current UI, increasing maintenance surface.",
+    "Backend canister frequently enters 'stopped' state during draft iterations, requiring redeploys to restore functionality; impacts reliability/testing cadence.",
+    "Draft-mode updates sometimes lead to backend call failures with HTTP 400 responses (headers include x-ic-canister-id), causing the app to error immediately after a new draft is created; likely related to draft canister lifecycle/preview caching or actor calling an outdated/stopped canister.",
+    "Backend getCallerUserProfile() trapping (authorization/runtime trap) can prevent frontend fallbacks from triggering, causing indefinite 'Loading your profile…' state.",
+    "Actor readiness race conditions can cause 'Actor not available' / 'Connection not ready' during profile creation/saving, leading to failed onboarding and repeated retries.",
+    "Heat map month labels can drift vertically ('stepped' months) or mis-anchor if header row layout differs from grid (not sharing identical grid columns/positioning).",
+    "Theme-dependent heat map cell colors may not update immediately on theme toggle if color computation is memoized/cached without theme as a dependency.",
+    "Training log save can fail with 'invalid record' if frontend adds new SessionTheme options (e.g., Open Mat) without updating backend candid/Motoko types."
+  ],
+  "isFixRequest": false,
+  "gameProjectType": "none",
+  "projectName": "BJJ Roll Log & Belt Tracker",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0,
+  "requiresBackendChanges": false,
+  "requiresFrontendChanges": true
+}

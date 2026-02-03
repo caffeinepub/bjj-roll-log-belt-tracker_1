@@ -1,0 +1,40 @@
+{
+  "kind": "build_request",
+  "title": "Clean up Submission Log add-submission dropdowns with integrated search + live filtering",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Update the four belt “Add submission…” controls in the Submission Log (the four selected combobox trigger buttons) to use a cleaner dropdown pattern where the full submission options list live-filters as the user types, and the search field is visually integrated with the add-submission control (i.e., the search input is cleanly located in/at the top of the dropdown experience rather than feeling separate from the trigger). Apply changes only to the selected add-submission controls (the four belt combobox triggers), implemented via frontend/src/components/SubmissionSelectInput.tsx.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Create a cleaner Search/Filters Dropdowns where the complete list filters as you search for them. The search field area should be cleanly located where the add submission buttons with a nice dropdown."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each belt’s add-submission control opens a dropdown that shows the complete options list by default and filters the list in real time as the user types.",
+        "The search input is presented as part of the dropdown experience in a clean, compact way (no visually awkward separation between the trigger and the search field).",
+        "The dropdown remains keyboard-accessible (type to filter, arrow keys to navigate, enter to select) and closes upon selection.",
+        "No other Submission Log elements outside the four selected add-submission controls are modified."
+      ]
+    }
+  ],
+  "constraints": [
+    "Apply changes ONLY to the four selected elements (the four belt add-submission combobox trigger buttons) and the minimal supporting code necessary to implement them (i.e., SubmissionSelectInput.tsx).",
+    "Do not edit any files under frontend/src/components/ui (read-only shadcn components)."
+  ],
+  "nonGoals": [
+    "Do not remove the plus/minus controls on submission tags (not part of the selected elements in this prompt).",
+    "Do not change submission tag sizing/layout (not part of the selected elements in this prompt).",
+    "Do not change or remove the Submission Log Save button behavior (not part of the selected elements in this prompt).",
+    "Do not change backend data models or persistence behavior."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
