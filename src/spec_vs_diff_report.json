@@ -1,43 +1,50 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T00:56:37.882Z",
-  "summary": "Diff adds a new shared analytics helper module and updates ProfileAnalytics and TrainingLog toward the requested 6-metric/6-visualization expansion. However, some acceptance criteria cannot be confirmed from the truncated diffs, and at least the Training Log empty-state requirement is not evidenced.",
+  "generatedAt": "2026-02-05T01:47:56.207Z",
+  "summary": "REQ-2 documentation files for Draft 125 were added, but the diff also includes modifications to application/backend files despite explicit constraints requiring a clean rebuild/redeploy with no source code changes. This conflicts with REQ-1 and the stated constraints.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Profile Analytics \"Training Statistics\" renders exactly 6 metric tiles/cards corresponding to the requested list.",
-      "reason": "The diff shows calculations for multiple metrics (sessions, hours, rolls, submissions learned, favorite theme, average intensity), but the render portion where the \"Training Statistics\" tiles/cards are displayed is truncated, so it cannot be verified that exactly 6 tiles are rendered and mapped to the required metrics.",
+      "requirement": "Create a new Caffeine draft and deploy the exact same application version currently deployed (Version 125) with no changes to backend or frontend source code and no state/schema migrations.",
+      "reason": "The diff shows source code/state-related files modified (including backend/main.mo, which was explicitly prohibited). That contradicts the 'no source code edits' and 'clean rebuild/redeploy only' requirement; the diff provides no evidence of a redeploy using identical code.",
       "evidence": [
-        "frontend/src/components/ProfileAnalytics.tsx (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "Total Training Time is the sum of session duration converted to hours (safe defaults when 0 sessions).",
-      "reason": "ProfileAnalytics computes `totalMinutes` then `totalHours = Math.round(totalMinutes / 60)`; this indicates rounding to a whole hour, which may not match the requirement of summing duration and converting to hours (potentially fractional). Also, a dedicated `durationToHours(durationMinutes: bigint)` helper was added but is not used in the shown component code.",
-      "evidence": [
-        "frontend/src/components/ProfileAnalytics.tsx (truncated)",
-        "frontend/src/lib/trainingAnalytics.ts (durationToHours)"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "If sessions.length === 0, each visualization area shows a clear empty-state message (in English) rather than an empty/broken chart.",
-      "reason": "TrainingLog includes an overall loading state, but the truncated diff does not show any per-visualization empty-state handling when `sessions` is empty; charts appear to be computed/rendered regardless.",
-      "evidence": [
-        "frontend/src/components/TrainingLog.tsx (truncated)"
+        "backend/main.mo",
+        "frontend-file-summaries.txt",
+        "project_state.json"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.62,
+  "hallucinated_features": [
+    {
+      "description": "Backend source changes in backend/main.mo",
+      "reason": "The BuildRequest explicitly constrained not to modify backend/main.mo (and no application source changes). Any modification here is out of scope for a clean rebuild/redeploy.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Updates to frontend-file-summaries.txt describing numerous frontend component changes (e.g., App.tsx init flow, Header branding, TrainingLog analytics, dialogs, etc.)",
+      "reason": "The request explicitly forbids introducing new features or UI changes and requires no frontend source code edits; this modified summary file indicates changes beyond documentation-only redeploy notes.",
+      "evidence": [
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Modification of project_state.json (project metadata/state description changes)",
+      "reason": "Not requested; the BuildRequest is for a clean rebuild/redeploy plus adding three Draft 125 documentation files only.",
+      "evidence": [
+        "project_state.json"
+      ]
+    }
+  ],
+  "confidence": 0.74,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/ProfileAnalytics.tsx",
-    "frontend/src/components/TrainingLog.tsx",
-    "frontend/src/lib/intensityUtils.ts",
-    "frontend/src/lib/trainingAnalytics.ts",
+    "frontend/REBUILD_DEPLOY_DRAFT_125.md",
+    "frontend/REDEPLOY_NOTE_DRAFT_125.md",
+    "frontend/SMOKE_CHECK_DRAFT_125.md",
     "project_state.json"
   ]
 }

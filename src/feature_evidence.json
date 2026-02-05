@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-profile-analytics-page-frontend-src-components-profileanalytics-tsx-so-the-training-statistics-section-displays-6-metrics-instead-of-the-current-4-using-the-existing-per-user-training-sessions-data-and-submission-log-data-1-total-sessions-count-of-sessions-2-total-training-time-sum-of-session-duration-converted-to-hours-3-total-rolls-sum-of-session-rolls-4-submissions-learned-count-of-unique-submission-names-achieved-at-blue-belt-and-above-derived-from-the-user-submission-log-arrays-for-blue-purple-brown-black-5-favorite-theme-most-frequent-sessiontheme-across-sessions-displayed-using-the-existing-theme-label-formatter-and-6-average-intensity-average-of-session-intensity-across-sessions-using-a-consistent-numeric-mapping-and-displayed-as-a-label",
-      "featureTitle": "Update the Profile Analytics page (frontend/src/components/ProfileAnalytics.tsx) so the \"Training Statistics\" section displays 6 metrics (instead of the current 4), using the existing per-user training sessions data and submission log data: (1) Total Sessions (count of sessions), (2) Total Training Time (sum of session duration converted to hours), (3) Total Rolls (sum of session.rolls), (4) Submissions Learned (count of unique submission names achieved at blue belt and above, derived from the user submission log arrays for blue/purple/brown/black), (5) Favorite Theme (most frequent sessionTheme across sessions, displayed using the existing theme label formatter), and (6) Average Intensity (average of session.intensity across sessions, using a consistent numeric mapping and displayed as a label).",
+      "featureId": "feature-create-a-new-caffeine-draft-and-deploy-the-exact-same-application-version-currently-deployed-version-125-with-no-changes-to-backend-or-frontend-source-code-and-no-state-schema-migrations",
+      "featureTitle": "Create a new Caffeine draft and deploy the exact same application version currently deployed (Version 125) with no changes to backend or frontend source code and no state/schema migrations.",
       "files": [
-        "frontend/src/components/ProfileAnalytics.tsx",
-        "frontend/src/lib/intensityUtils.ts",
-        "frontend/src/lib/trainingAnalytics.ts"
+        "frontend/REDEPLOY_NOTE_DRAFT_125.md",
+        "frontend/SMOKE_CHECK_DRAFT_125.md"
       ],
       "components": [
         "authorization@4.0.0",
@@ -24,11 +23,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-training-log-analytics-section-frontend-src-components-traininglog-tsx-so-it-provides-6-analytics-visualizations-instead-of-the-current-4-based-on-existing-trainingsession-fields-trainingtype-sessiontheme-rolls-intensity-moodrating-duration-date-1-gi-vs-no-gi-ratio-as-a-pie-chart-showing-percentage-of-sessions-by-trainingtype-2-session-theme-frequency-as-a-pie-chart-showing-distribution-of-themes-practiced-3-average-rolls-per-session-as-a-time-trend-chart-4-intensity-trends-over-time-as-a-line-chart-over-time-average-intensity-per-time-bucket-5-mood-vs-intensity-correlation-as-a-scatter-plot-moodrating-vs-intensity-numeric-and-6-weekly-monthly-training-volume-as-a-bar-chart-showing-total-hours-or-sessions-per-week-month-include-a-simple-toggle-for-weekly-vs-monthly-and-hours-vs-sessions-or-otherwise-clearly-support-both-weekly-monthly-and-hours-sessions-without-adding-backend-apis",
-      "featureTitle": "Update the Training Log analytics section (frontend/src/components/TrainingLog.tsx) so it provides 6 analytics visualizations (instead of the current 4), based on existing TrainingSession fields (trainingType, sessionTheme, rolls, intensity, moodRating, duration, date): (1) Gi vs No-Gi Ratio as a pie chart showing percentage of sessions by trainingType, (2) Session Theme Frequency as a pie chart showing distribution of themes practiced, (3) Average Rolls per Session as a time trend chart, (4) Intensity Trends Over Time as a line chart over time (average intensity per time bucket), (5) Mood vs Intensity Correlation as a scatter plot (moodRating vs intensity numeric), and (6) Weekly / Monthly Training Volume as a bar chart showing total hours or sessions per week/month (include a simple toggle for Weekly vs Monthly and Hours vs Sessions, or otherwise clearly support both weekly/monthly and hours/sessions without adding backend APIs).",
+      "featureId": "feature-add-new-deployment-documentation-for-this-redeploy-by-creating-draft-125-versions-of-the-existing-templates-frontend-rebuild-deploy-draft-125-md-frontend-redeploy-note-draft-125-md-and-frontend-smoke-check-draft-125-md-explicitly-stating-that-there-were-no-functional-ui-schema-state-changes",
+      "featureTitle": "Add new deployment documentation for this redeploy by creating Draft 125 versions of the existing templates: frontend/REBUILD_DEPLOY_DRAFT_125.md, frontend/REDEPLOY_NOTE_DRAFT_125.md, and frontend/SMOKE_CHECK_DRAFT_125.md, explicitly stating that there were no functional/UI/schema/state changes.",
       "files": [
-        "frontend/src/components/TrainingLog.tsx",
-        "frontend/src/lib/trainingAnalytics.ts"
+        "frontend/REBUILD_DEPLOY_DRAFT_125.md",
+        "frontend/REDEPLOY_NOTE_DRAFT_125.md",
+        "frontend/SMOKE_CHECK_DRAFT_125.md"
       ],
       "components": [
         "authorization@4.0.0",

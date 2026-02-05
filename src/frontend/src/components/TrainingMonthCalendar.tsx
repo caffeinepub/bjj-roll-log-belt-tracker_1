@@ -335,7 +335,7 @@ export default function TrainingMonthCalendar({ sessions, onEditSession }: Train
                           <img
                             src={moodIcon.src}
                             alt={moodIcon.alt}
-                            className="w-5 h-5"
+                            className="w-5 h-5 rounded-xl"
                             title={moodIcon.alt}
                           />
                         </div>

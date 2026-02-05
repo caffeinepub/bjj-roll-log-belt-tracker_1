@@ -170,7 +170,7 @@ export default function AddTechniqueDialog({ open, onOpenChange }: AddTechniqueD
               <SelectTrigger id="type">
                 <SelectValue placeholder="Select technique type..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[200px] overflow-y-auto">
                 {SUBMISSION_OPTIONS.map((option) => (
                   <SelectItem key={option} value={option}>
                     {option}

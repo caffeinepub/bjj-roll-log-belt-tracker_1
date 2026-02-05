@@ -1,60 +1,53 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Expand Profile Analytics and Training Log analytics from 4 to 6 metrics/visualizations",
+  "title": "Draft 125 redeploy (no code changes) documentation updates",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Expand Profile Analytics “Training Statistics” to exactly 6 metrics derived from existing training sessions and submission log data (including theme + intensity summaries).",
+      "summary": "Support a Draft 125 clean redeploy by documenting the redeploy record and smoke verification without changing application source code.",
       "acceptanceCriteria": [
-        "Profile Analytics \"Training Statistics\" renders exactly 6 metric tiles/cards corresponding to the requested list.",
-        "Total Rolls equals the sum of TrainingSession.rolls across all loaded sessions.",
-        "Submissions Learned counts unique submission names across blueBelt, purpleBelt, brownBelt, and blackBelt submission log arrays (case-insensitive uniqueness).",
-        "Favorite Theme shows the most frequent theme label derived from TrainingSession.sessionTheme via the existing formatter.",
-        "Average Intensity is computed from all sessions with a consistent ordinal mapping of the existing Intensity enum and displays a sensible label (and a safe fallback when there are no sessions).",
-        "When there are 0 sessions, all six metrics display safe defaults (e.g., 0 / N/A) without throwing."
+        "A new draft is created and deployed successfully.",
+        "Deployment uses the same code as Version 125 (no source code edits).",
+        "No backend migration is executed/required as part of this redeploy.",
+        "The deployed app loads and is usable (basic smoke verification: app loads, Internet Identity login works, dashboard renders after profile is available)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/lib/intensityUtils.ts",
+          "path": "frontend/REDEPLOY_NOTE_DRAFT_125.md",
           "operation": "modify",
-          "description": "Add a consistent Intensity <-> numeric ordinal mapping helper (and nearest-label helper) so both Profile Analytics and Training Log analytics can compute and label average intensity deterministically."
+          "description": "After the redeploy completes, fill in the redeploy record fields for Draft Version 125 (date/time, network, canister IDs, URL, steps executed, and outcomes) and explicitly confirm no functional/UI/schema/state changes and no migrations."
         },
         {
-          "path": "frontend/src/lib/trainingAnalytics.ts",
-          "operation": "create",
-          "description": "Create shared analytics helpers for session aggregation (e.g., safe duration-to-hours conversion, favorite theme counting using the existing theme formatter, and intensity averaging using the shared intensity mapping) to keep ProfileAnalytics.tsx logic concise and consistent."
-        },
-        {
-          "path": "frontend/src/components/ProfileAnalytics.tsx",
+          "path": "frontend/SMOKE_CHECK_DRAFT_125.md",
           "operation": "modify",
-          "description": "Update the “Training Statistics” card grid to render exactly 6 metric tiles: Total Sessions, Total Training Time (hours derived from duration), Total Rolls (sum of rolls), Submissions Learned (unique submissions across blue/purple/brown/black from submission log via useGetSubmissionLog + normalizeSubmissionName), Favorite Theme (mode of sessionTheme formatted with formatSessionTheme), and Average Intensity (average via shared mapping shown as label with safe fallback like N/A). Ensure safe defaults for 0 sessions and keep all user-facing text in English."
+          "description": "After the redeploy completes, record the smoke-check execution results for Draft 125 (app loads, Internet Identity login works, dashboard renders after profile is available) and paste any console errors if present."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Expand Training Log “Training Analytics” to 6 chart visualizations (gi/no-gi ratio, theme distribution, rolls trend, intensity trend, mood vs intensity scatter, and weekly/monthly volume with toggles) derived from existing sessions only.",
+      "summary": "Create Draft 125 redeploy documentation files from the existing template patterns, explicitly stating there were no functional/UI/schema/state changes.",
       "acceptanceCriteria": [
-        "Training Log renders 6 analytics visualizations matching the requested list, and all charts render without runtime errors.",
-        "Gi vs No-Gi ratio uses TrainingSession.trainingType and displays correct proportions for the loaded sessions.",
-        "Session Theme Frequency chart uses TrainingSession.sessionTheme formatted to human-readable labels.",
-        "Average Rolls per Session trend derives from TrainingSession.rolls and is grouped into consistent time buckets (e.g., by week or month) with deterministic ordering.",
-        "Intensity trend converts the Intensity enum to a numeric scale consistently and charts the aggregated intensity over time.",
-        "Mood vs Intensity correlation chart plots one point per session (or per bucket, if explicitly chosen) using moodRating and intensity numeric values.",
-        "Weekly/Monthly volume chart supports both week and month aggregation and supports showing either hours (duration-derived) or sessions (count).",
-        "If sessions.length === 0, each visualization area shows a clear empty-state message (in English) rather than an empty/broken chart."
+        "frontend/REBUILD_DEPLOY_DRAFT_125.md exists and follows the structure/pattern of prior REBUILD_DEPLOY_DRAFT_*.md files, referencing Draft Version 125 and 'Code Changes: None'.",
+        "frontend/REDEPLOY_NOTE_DRAFT_125.md exists and follows the pattern of prior REDEPLOY_NOTE_DRAFT_*.md files for Draft 125.",
+        "frontend/SMOKE_CHECK_DRAFT_125.md exists and follows the pattern of prior SMOKE_CHECK_DRAFT_*.md files for Draft 125."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/lib/trainingAnalytics.ts",
-          "operation": "modify",
-          "description": "Extend shared analytics helpers to support deterministic time-bucketing (weekly and monthly), computing per-bucket averages (rolls, intensity) and totals (hours, sessions), and generating chart-friendly datasets for Recharts while handling empty inputs safely."
+          "path": "frontend/REBUILD_DEPLOY_DRAFT_125.md",
+          "operation": "create",
+          "description": "Create a Draft Version 125 clean rebuild/redeploy doc matching the structure of prior REBUILD_DEPLOY_DRAFT_*.md files, explicitly stating: Migration Required: No; Code Changes: None; no functional/UI/schema/state changes."
         },
         {
-          "path": "frontend/src/components/TrainingLog.tsx",
-          "operation": "modify",
-          "description": "Replace/upgrade the Training Analytics section to include exactly 6 Recharts-based visualizations: (1) Gi vs No-Gi Ratio pie (trainingType), (2) Session Theme Frequency pie (sessionTheme formatted with formatSessionTheme), (3) Average Rolls per Session trend over time (line chart with deterministic time buckets), (4) Intensity Trends Over Time (line chart using shared intensity numeric mapping and aggregation), (5) Mood vs Intensity Correlation (scatter plot: moodRating vs intensity numeric), (6) Weekly/Monthly Training Volume (bar chart) with a simple in-UI toggle supporting both Weekly vs Monthly and Hours vs Sessions without any new backend calls. Ensure each visualization shows an English empty-state message when sessions.length === 0."
+          "path": "frontend/REDEPLOY_NOTE_DRAFT_125.md",
+          "operation": "create",
+          "description": "Create a Draft Version 125 redeploy note file following the pattern of prior REDEPLOY_NOTE_DRAFT_*.md files, including placeholders for date/time, network, canister IDs/URL, steps executed, and a clear statement that there were no functional/UI/schema/state changes."
+        },
+        {
+          "path": "frontend/SMOKE_CHECK_DRAFT_125.md",
+          "operation": "create",
+          "description": "Create a Draft Version 125 smoke check checklist following the pattern of prior SMOKE_CHECK_DRAFT_*.md files, covering app load, Internet Identity login, and dashboard render after profile availability, with spaces to record results and errors."
         }
       ]
     }

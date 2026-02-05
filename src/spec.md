@@ -1,10 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Expand analytics on the Profile Analytics and Training Log pages from 4 to 6 metrics/visualizations each, derived from existing session and submission-log data.
+**Goal:** Create a new Caffeine draft and redeploy the exact same currently deployed application version (Version 125) with no code or migration changes.
 
 **Planned changes:**
-- Update Profile Analytics (Training Statistics) to show 6 metrics: Total Sessions, Total Training Time (hours), Total Rolls, Submissions Learned (unique submissions at blue belt and above), Favorite Theme, and Average Intensity (mapped consistently to a label), with safe defaults when there are no sessions.
-- Update Training Log analytics to show 6 visualizations: Gi vs No-Gi ratio (pie), Session Theme frequency (pie), Average Rolls per Session (time trend), Intensity trends over time (line), Mood vs Intensity correlation (scatter), and Weekly/Monthly Training Volume (bar) supporting both week/month and hours/sessions views, with an empty-state message when there are no sessions.
+- Create a new draft and deploy using the same code as Version 125 (no backend/frontend source changes; no state/schema migrations).
+- Add redeploy documentation by creating Draft 125 versions of existing templates:
+  - frontend/REBUILD_DEPLOY_DRAFT_125.md
+  - frontend/REDEPLOY_NOTE_DRAFT_125.md
+  - frontend/SMOKE_CHECK_DRAFT_125.md
+  Each should explicitly state there were no functional/UI/schema/state changes.
 
-**User-visible outcome:** Users see expanded, more detailed analytics on their profile and training log, including new metrics and charts that summarize training volume, themes, intensity, mood relationships, and progress at a glance.
+**User-visible outcome:** The app is redeployed as the same Version 125 build and remains usable (app loads, Internet Identity login works, and the dashboard renders after the profile is available).
