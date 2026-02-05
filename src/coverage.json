@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T01:47:56.231Z",
+  "generatedAt": "2026-02-05T02:01:25.295Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,43 +12,44 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Create a new Caffeine draft and deploy the exact same application version currently deployed (Version 125) with no changes to backend or frontend source code and no state/schema migrations.",
+        "summary": "Move the existing Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` so it appears inside the \"Training Statistics\" card, positioned directly under the 6 metric tiles, while keeping the heat map’s current functionality and sizing (same grid cell size, same scroll behavior, same year selector/legend behavior, same computed totals). Remove the standalone \"Training Heat Map\" section that currently renders below the profile/statistics cards.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-          "frontend/SMOKE_CHECK_DRAFT_125.md"
+          "frontend/src/components/TrainingHeatMap.tsx",
+          "frontend/src/components/ProfileAnalytics.tsx"
         ],
         "matchedFiles": [
-          "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-          "frontend/SMOKE_CHECK_DRAFT_125.md"
+          "frontend/src/components/TrainingHeatMap.tsx",
+          "frontend/src/components/ProfileAnalytics.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add new deployment documentation for this redeploy by creating Draft 125 versions of the existing templates: frontend/REBUILD_DEPLOY_DRAFT_125.md, frontend/REDEPLOY_NOTE_DRAFT_125.md, and frontend/SMOKE_CHECK_DRAFT_125.md, explicitly stating that there were no functional/UI/schema/state changes.",
+        "summary": "Remove the \"bug\"/debug features from the user-facing UI: remove the debug toggle button (Bug icon) from `frontend/src/components/Header.tsx` and stop rendering the debug overlay from `frontend/src/App.tsx` in all app states (initializing, login, actor-connecting, profile-loading, profile-setup, loaded, fallback).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/REBUILD_DEPLOY_DRAFT_125.md",
-          "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-          "frontend/SMOKE_CHECK_DRAFT_125.md"
+          "frontend/src/components/Header.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/DebugOverlay.tsx"
         ],
         "matchedFiles": [
-          "frontend/REBUILD_DEPLOY_DRAFT_125.md",
-          "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-          "frontend/SMOKE_CHECK_DRAFT_125.md"
+          "frontend/src/components/Header.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/components/DebugOverlay.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/REBUILD_DEPLOY_DRAFT_125.md",
-    "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-    "frontend/SMOKE_CHECK_DRAFT_125.md",
+    "frontend/src/App.tsx",
+    "frontend/src/components/DebugOverlay.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/ProfileAnalytics.tsx",
+    "frontend/src/components/TrainingHeatMap.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

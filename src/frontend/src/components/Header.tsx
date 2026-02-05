@@ -2,7 +2,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useGetCallerUserProfile, useUpdateThemePreference } from '../hooks/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { LogOut, Moon, Sun, Bug, User } from 'lucide-react';
+import { LogOut, Moon, Sun, User } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface HeaderProps {
@@ -34,12 +34,6 @@ export default function Header({ onProfileClick }: HeaderProps) {
     if (isAuthenticated) {
       updateThemeMutation.mutate(newTheme);
     }
-  };
-
-  const toggleDebugMode = () => {
-    const currentDebugMode = localStorage.getItem('bjj-debug-mode') === 'true';
-    localStorage.setItem('bjj-debug-mode', (!currentDebugMode).toString());
-    window.location.reload(); // Reload to apply debug mode
   };
 
   return (
@@ -83,16 +77,6 @@ export default function Header({ onProfileClick }: HeaderProps) {
               </Button>
             </>
           )}
-
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={toggleDebugMode}
-            title="Toggle Debug Mode"
-          >
-            <Bug className="h-5 w-5" />
-            <span className="sr-only">Toggle debug mode</span>
-          </Button>
 
           <Button variant="ghost" size="icon" onClick={toggleTheme}>
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

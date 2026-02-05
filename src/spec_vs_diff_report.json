@@ -1,50 +1,49 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T01:47:56.207Z",
-  "summary": "REQ-2 documentation files for Draft 125 were added, but the diff also includes modifications to application/backend files despite explicit constraints requiring a clean rebuild/redeploy with no source code changes. This conflicts with REQ-1 and the stated constraints.",
+  "generatedAt": "2026-02-05T02:01:25.257Z",
+  "summary": "REQ-2 appears implemented: the Header no longer imports/renders a Bug/debug toggle, and App.tsx no longer shows any DebugOverlay usage in the visible initialization/auth/profile states. REQ-1 cannot be verified from the provided diff summary because the relevant part of ProfileAnalytics.tsx is truncated before the Training Statistics card/heatmap placement; additionally TrainingHeatMap gained an `embedded` prop but there is no evidence it is used from ProfileAnalytics.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Create a new Caffeine draft and deploy the exact same application version currently deployed (Version 125) with no changes to backend or frontend source code and no state/schema migrations.",
-      "reason": "The diff shows source code/state-related files modified (including backend/main.mo, which was explicitly prohibited). That contradicts the 'no source code edits' and 'clean rebuild/redeploy only' requirement; the diff provides no evidence of a redeploy using identical code.",
+      "requirement": "Move the existing Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` so it appears inside the \"Training Statistics\" card directly under the 6 metric tiles, and remove the standalone \"Training Heat Map\" section below the cards, keeping behavior/sizing unchanged (w-3 h-3 cells, same scroll/overflow, selectors/legend/loading).",
+      "reason": "The diff for `ProfileAnalytics.tsx` is truncated before showing the \"Training Statistics\" card and any TrainingHeatMap placement/removal of the standalone section, so there is insufficient evidence that the heat map was moved inside the card and removed as a separate section, or that sizing/scroll behavior remains unchanged.",
       "evidence": [
-        "backend/main.mo",
-        "frontend-file-summaries.txt",
-        "project_state.json"
+        "frontend/src/components/ProfileAnalytics.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Backend source changes in backend/main.mo",
-      "reason": "The BuildRequest explicitly constrained not to modify backend/main.mo (and no application source changes). Any modification here is out of scope for a clean rebuild/redeploy.",
+      "description": "Local-first theme application on App mount by reading `bjj-theme` from localStorage and toggling the document `dark` class immediately.",
+      "reason": "BuildRequest focuses on heatmap layout and removing debug UI; it does not request changes to theme initialization behavior.",
       "evidence": [
-        "backend/main.mo"
+        "frontend/src/App.tsx"
       ]
     },
     {
-      "description": "Updates to frontend-file-summaries.txt describing numerous frontend component changes (e.g., App.tsx init flow, Header branding, TrainingLog analytics, dialogs, etc.)",
-      "reason": "The request explicitly forbids introducing new features or UI changes and requires no frontend source code edits; this modified summary file indicates changes beyond documentation-only redeploy notes.",
+      "description": "Header theme toggle rewritten to be local-first (immediate localStorage write + async backend mutation).",
+      "reason": "Not requested by REQ-1 or REQ-2; this is additional behavior beyond moving the heatmap/removing debug UI.",
       "evidence": [
-        "frontend-file-summaries.txt"
+        "frontend/src/components/Header.tsx"
       ]
     },
     {
-      "description": "Modification of project_state.json (project metadata/state description changes)",
-      "reason": "Not requested; the BuildRequest is for a clean rebuild/redeploy plus adding three Draft 125 documentation files only.",
+      "description": "TrainingHeatMap adds an `embedded?: boolean` prop and a MutationObserver-based mechanism (`themeKey`) to force re-render on theme class changes.",
+      "reason": "REQ-1 explicitly states heatmap behavior should remain unchanged and does not request new props or theme-observer logic.",
       "evidence": [
-        "project_state.json"
+        "frontend/src/components/TrainingHeatMap.tsx"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.67,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/REBUILD_DEPLOY_DRAFT_125.md",
-    "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-    "frontend/SMOKE_CHECK_DRAFT_125.md",
+    "frontend/src/App.tsx",
+    "frontend/src/components/DebugOverlay.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/ProfileAnalytics.tsx",
+    "frontend/src/components/TrainingHeatMap.tsx",
     "project_state.json"
   ]
 }

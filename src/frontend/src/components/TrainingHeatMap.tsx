@@ -12,7 +12,11 @@ interface MonthLabel {
   weeks: number;
 }
 
-export default function TrainingHeatMap() {
+interface TrainingHeatMapProps {
+  embedded?: boolean;
+}
+
+export default function TrainingHeatMap({ embedded = false }: TrainingHeatMapProps) {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -187,6 +191,161 @@ export default function TrainingHeatMap() {
 
   const activeDays = dailyHours.size;
 
+  const heatMapContent = (
+    <div className="space-y-6">
+      {/* Year Selector */}
+      <div className="flex items-center justify-center gap-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => handleYearChange('prev')}
+          disabled={isLoading}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        
+        <Select
+          value={selectedYear.toString()}
+          onValueChange={(value) => {
+            setSelectedYear(parseInt(value));
+          }}
+          disabled={isLoading}
+        >
+          <SelectTrigger className="w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {availableYears.map((year) => (
+              <SelectItem key={year} value={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => handleYearChange('next')}
+          disabled={isLoading || selectedYear >= currentYear}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Heat Map Grid - Monday to Sunday rows (top to bottom) with explicit day labels */}
+      <div className="heat-map-container overflow-auto pb-0.5">
+        <div className="min-w-max flex justify-center">
+          <div className="inline-flex gap-1">
+            {/* Day labels - All days Monday → Sunday displayed explicitly */}
+            <div className="flex flex-col justify-start pt-5 flex-shrink-0">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                <div
+                  key={day}
+                  className="h-3 flex items-center text-[10px] text-muted-foreground mb-1"
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Grid */}
+            <div className="flex-1">
+              {/* Month headers - using CSS Grid with explicit row placement to prevent stacking */}
+              <div 
+                className="grid gap-1 mb-1 h-4"
+                style={{
+                  gridTemplateColumns: `repeat(${yearGrid.weeks.length}, 12px)`,
+                }}
+              >
+                {monthLabels.map((month, idx) => (
+                  <div
+                    key={idx}
+                    className="text-[10px] text-muted-foreground flex items-start leading-none"
+                    style={{ 
+                      gridColumnStart: month.columnIndex + 1,
+                      gridColumnEnd: month.columnIndex + 1 + month.weeks,
+                      gridRow: 1,
+                    }}
+                  >
+                    {month.name}
+                  </div>
+                ))}
+              </div>
+
+              {/* Week grid with exact date mapping - rows are Monday (0) to Sunday (6) */}
+              <div className="flex gap-1">
+                {yearGrid.weeks.map((week, weekIdx) => (
+                  <div key={weekIdx} className="flex flex-col gap-1 flex-shrink-0">
+                    {week.map((day, dayIdx) => {
+                      const hours = day ? dailyHours.get(day) || 0 : 0;
+                      const color = day ? getColorForHours(hours, themeKey) : 'transparent';
+                      const isSelected = day === selectedDate;
+                      
+                      return (
+                        <button
+                          key={dayIdx}
+                          className={`w-3 h-3 rounded-sm transition-all ${
+                            day ? 'cursor-pointer hover:ring-2 hover:ring-ring' : 'cursor-default'
+                          } ${isSelected ? 'ring-2 ring-ring' : ''}`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => day && setSelectedDate(day)}
+                          disabled={!day || isLoading}
+                          title={day ? `${day}: ${hours.toFixed(1)}h` : ''}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <span>Less</span>
+        <div className="flex gap-1">
+          {[0, 0.5, 1.5, 2.5, 3.5].map((hours, idx) => (
+            <div
+              key={idx}
+              className="w-3 h-3 rounded-sm"
+              style={{ backgroundColor: getColorForHours(hours, themeKey) }}
+              title={idx === 4 ? '3.5+ hours' : `${hours}+ hours`}
+            />
+          ))}
+        </div>
+        <span>More</span>
+      </div>
+
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <p className="text-sm text-muted-foreground">Loading heat map...</p>
+        </div>
+      )}
+    </div>
+  );
+
+  // If embedded mode, return content without card wrapper
+  if (embedded) {
+    return (
+      <div className="space-y-4 pt-6 border-t">
+        <div className="flex items-center gap-2">
+          <Flame className="h-5 w-5 text-orange-500" />
+          <div>
+            <h3 className="text-sm font-semibold">Training Heat Map</h3>
+            <p className="text-xs text-muted-foreground">
+              {totalHours}h trained across {activeDays} days in {selectedYear}
+            </p>
+          </div>
+        </div>
+        {heatMapContent}
+      </div>
+    );
+  }
+
+  // Standalone mode with card wrapper
   return (
     <Card>
       <CardHeader>
@@ -198,138 +357,8 @@ export default function TrainingHeatMap() {
           {totalHours}h trained across {activeDays} days in {selectedYear}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Year Selector */}
-        <div className="flex items-center justify-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handleYearChange('prev')}
-            disabled={isLoading}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          
-          <Select
-            value={selectedYear.toString()}
-            onValueChange={(value) => {
-              setSelectedYear(parseInt(value));
-            }}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {availableYears.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handleYearChange('next')}
-            disabled={isLoading || selectedYear >= currentYear}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Heat Map Grid - Monday to Sunday rows (top to bottom) with explicit day labels */}
-        <div className="heat-map-container overflow-auto pb-0.5">
-          <div className="min-w-max flex justify-center">
-            <div className="inline-flex gap-1">
-              {/* Day labels - All days Monday → Sunday displayed explicitly */}
-              <div className="flex flex-col justify-start pt-5 flex-shrink-0">
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                  <div
-                    key={day}
-                    className="h-3 flex items-center text-[10px] text-muted-foreground mb-1"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* Grid */}
-              <div className="flex-1">
-                {/* Month headers - using CSS Grid with explicit row placement to prevent stacking */}
-                <div 
-                  className="grid gap-1 mb-1 h-4"
-                  style={{
-                    gridTemplateColumns: `repeat(${yearGrid.weeks.length}, 12px)`,
-                  }}
-                >
-                  {monthLabels.map((month, idx) => (
-                    <div
-                      key={idx}
-                      className="text-[10px] text-muted-foreground flex items-start leading-none"
-                      style={{ 
-                        gridColumnStart: month.columnIndex + 1,
-                        gridColumnEnd: month.columnIndex + 1 + month.weeks,
-                        gridRow: 1,
-                      }}
-                    >
-                      {month.name}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Week grid with exact date mapping - rows are Monday (0) to Sunday (6) */}
-                <div className="flex gap-1">
-                  {yearGrid.weeks.map((week, weekIdx) => (
-                    <div key={weekIdx} className="flex flex-col gap-1 flex-shrink-0">
-                      {week.map((day, dayIdx) => {
-                        const hours = day ? dailyHours.get(day) || 0 : 0;
-                        const color = day ? getColorForHours(hours, themeKey) : 'transparent';
-                        const isSelected = day === selectedDate;
-                        
-                        return (
-                          <button
-                            key={dayIdx}
-                            className={`w-3 h-3 rounded-sm transition-all ${
-                              day ? 'cursor-pointer hover:ring-2 hover:ring-ring' : 'cursor-default'
-                            } ${isSelected ? 'ring-2 ring-ring' : ''}`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => day && setSelectedDate(day)}
-                            disabled={!day || isLoading}
-                            title={day ? `${day}: ${hours.toFixed(1)}h` : ''}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <span>Less</span>
-          <div className="flex gap-1">
-            {[0, 0.5, 1.5, 2.5, 3.5].map((hours, idx) => (
-              <div
-                key={idx}
-                className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: getColorForHours(hours, themeKey) }}
-                title={idx === 4 ? '3.5+ hours' : `${hours}+ hours`}
-              />
-            ))}
-          </div>
-          <span>More</span>
-        </div>
-
-        {isLoading && (
-          <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-muted-foreground">Loading heat map...</p>
-          </div>
-        )}
+      <CardContent>
+        {heatMapContent}
       </CardContent>
     </Card>
   );

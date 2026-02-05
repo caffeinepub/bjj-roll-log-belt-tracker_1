@@ -222,12 +222,12 @@ export default function ProfileAnalytics() {
                 <p className="text-xs text-muted-foreground">Overall session intensity</p>
               </div>
             </div>
+
+            {/* Embedded Training Heat Map */}
+            <TrainingHeatMap embedded />
           </CardContent>
         </Card>
       </div>
-
-      {/* Training Heat Map */}
-      <TrainingHeatMap />
 
       {/* Training Goals Section */}
       {userProfile.trainingGoals.length > 0 && (

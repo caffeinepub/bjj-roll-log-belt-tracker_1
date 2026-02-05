@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-new-caffeine-draft-and-deploy-the-exact-same-application-version-currently-deployed-version-125-with-no-changes-to-backend-or-frontend-source-code-and-no-state-schema-migrations",
-      "featureTitle": "Create a new Caffeine draft and deploy the exact same application version currently deployed (Version 125) with no changes to backend or frontend source code and no state/schema migrations.",
+      "featureId": "feature-move-the-existing-training-heat-map-rendering-in-frontend-src-components-profileanalytics-tsx-so-it-appears-inside-the-training-statistics-card-positioned-directly-under-the-6-metric-tiles-while-keeping-the-heat-map-s-current-functionality-and-sizing-same-grid-cell-size-same-scroll-behavior-same-year-selector-legend-behavior-same-computed-totals-remove-the-standalone-training-heat-map-section-that-currently-renders-below-the-profile-statistics-cards",
+      "featureTitle": "Move the existing Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` so it appears inside the \"Training Statistics\" card, positioned directly under the 6 metric tiles, while keeping the heat map’s current functionality and sizing (same grid cell size, same scroll behavior, same year selector/legend behavior, same computed totals). Remove the standalone \"Training Heat Map\" section that currently renders below the profile/statistics cards.",
       "files": [
-        "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-        "frontend/SMOKE_CHECK_DRAFT_125.md"
+        "frontend/src/components/ProfileAnalytics.tsx",
+        "frontend/src/components/TrainingHeatMap.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -23,12 +23,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-new-deployment-documentation-for-this-redeploy-by-creating-draft-125-versions-of-the-existing-templates-frontend-rebuild-deploy-draft-125-md-frontend-redeploy-note-draft-125-md-and-frontend-smoke-check-draft-125-md-explicitly-stating-that-there-were-no-functional-ui-schema-state-changes",
-      "featureTitle": "Add new deployment documentation for this redeploy by creating Draft 125 versions of the existing templates: frontend/REBUILD_DEPLOY_DRAFT_125.md, frontend/REDEPLOY_NOTE_DRAFT_125.md, and frontend/SMOKE_CHECK_DRAFT_125.md, explicitly stating that there were no functional/UI/schema/state changes.",
+      "featureId": "feature-remove-the-bug-debug-features-from-the-user-facing-ui-remove-the-debug-toggle-button-bug-icon-from-frontend-src-components-header-tsx-and-stop-rendering-the-debug-overlay-from-frontend-src-app-tsx-in-all-app-states-initializing-login-actor-connecting-profile-loading-profile-setup-loaded-fallback",
+      "featureTitle": "Remove the \"bug\"/debug features from the user-facing UI: remove the debug toggle button (Bug icon) from `frontend/src/components/Header.tsx` and stop rendering the debug overlay from `frontend/src/App.tsx` in all app states (initializing, login, actor-connecting, profile-loading, profile-setup, loaded, fallback).",
       "files": [
-        "frontend/REBUILD_DEPLOY_DRAFT_125.md",
-        "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-        "frontend/SMOKE_CHECK_DRAFT_125.md"
+        "frontend/src/App.tsx",
+        "frontend/src/components/DebugOverlay.tsx",
+        "frontend/src/components/Header.tsx"
       ],
       "components": [
         "authorization@4.0.0",

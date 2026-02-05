@@ -8,7 +8,6 @@ import Footer from './components/Footer';
 import LoginScreen from './components/LoginScreen';
 import ProfileSetup from './components/ProfileSetup';
 import Dashboard from './pages/Dashboard';
-import DebugOverlay from './components/DebugOverlay';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
 import { useEffect } from 'react';
@@ -36,19 +35,13 @@ export default function App() {
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="text-muted-foreground">Initializing Internet Identity...</p>
         </div>
-        <DebugOverlay currentStep="initializing" />
       </div>
     );
   }
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
-    return (
-      <>
-        <LoginScreen />
-        <DebugOverlay currentStep="login" />
-      </>
-    );
+    return <LoginScreen />;
   }
 
   // Show actor connection status
@@ -60,7 +53,6 @@ export default function App() {
           <p className="text-muted-foreground">Connecting to backend...</p>
           <p className="text-xs text-muted-foreground">Step: {initStep}</p>
         </div>
-        <DebugOverlay currentStep="actor-connecting" />
       </div>
     );
   }
@@ -73,7 +65,6 @@ export default function App() {
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading profile...</p>
         </div>
-        <DebugOverlay currentStep="profile-loading" />
       </div>
     );
   }
@@ -90,7 +81,6 @@ export default function App() {
           <Footer />
         </div>
         <Toaster />
-        <DebugOverlay currentStep="profile-setup" />
       </ThemeProvider>
     );
   }
@@ -111,7 +101,6 @@ export default function App() {
           <Footer />
         </div>
         <Toaster />
-        <DebugOverlay currentStep="loaded" />
       </ThemeProvider>
     );
   }
@@ -123,7 +112,6 @@ export default function App() {
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <p className="text-muted-foreground">Loading...</p>
       </div>
-      <DebugOverlay currentStep="fallback" />
     </div>
   );
 }

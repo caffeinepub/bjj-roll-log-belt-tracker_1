@@ -1,53 +1,53 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Draft 125 redeploy (no code changes) documentation updates",
+  "title": "Embed Training Heat Map into Training Statistics card and remove debug UI",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Support a Draft 125 clean redeploy by documenting the redeploy record and smoke verification without changing application source code.",
+      "summary": "Render the existing Training Heat Map inside the Training Statistics card directly beneath the 6 metric tiles, and remove the standalone section below the cards while preserving all heat map behavior and sizing.",
       "acceptanceCriteria": [
-        "A new draft is created and deployed successfully.",
-        "Deployment uses the same code as Version 125 (no source code edits).",
-        "No backend migration is executed/required as part of this redeploy.",
-        "The deployed app loads and is usable (basic smoke verification: app loads, Internet Identity login works, dashboard renders after profile is available)."
+        "On the Profile Analytics tab, the Training Heat Map is rendered within the \"Training Statistics\" card, beneath the 6 metric tiles.",
+        "The Training Heat Map no longer appears as a separate section outside/below the statistics card.",
+        "Heat map behavior is unchanged: year navigation (prev/next + dropdown), day selection, legend, theme-aware coloring updates, and loading state work as they did previously.",
+        "Heat map sizing is unchanged: day cells remain 12px squares (`w-3 h-3`), and the grid retains its current overflow/scroll behavior."
       ],
       "file_operations": [
         {
-          "path": "frontend/REDEPLOY_NOTE_DRAFT_125.md",
+          "path": "frontend/src/components/TrainingHeatMap.tsx",
           "operation": "modify",
-          "description": "After the redeploy completes, fill in the redeploy record fields for Draft Version 125 (date/time, network, canister IDs, URL, steps executed, and outcomes) and explicitly confirm no functional/UI/schema/state changes and no migrations."
+          "description": "Add an embedded/in-card rendering mode so the heat map can be placed inside an existing parent card (Training Statistics) without introducing a nested standalone card section, while keeping the same year selector, legend, totals, theme-aware coloring recalculation, loading state, and the same grid sizing (`w-3 h-3`) and scroll/overflow behavior for the heat map container."
         },
         {
-          "path": "frontend/SMOKE_CHECK_DRAFT_125.md",
+          "path": "frontend/src/components/ProfileAnalytics.tsx",
           "operation": "modify",
-          "description": "After the redeploy completes, record the smoke-check execution results for Draft 125 (app loads, Internet Identity login works, dashboard renders after profile is available) and paste any console errors if present."
+          "description": "Move the TrainingHeatMap rendering into the \"Training Statistics\" CardContent directly under the 6 metric tiles (using the heat map’s embedded/in-card mode), and remove the standalone \"Training Heat Map\" section that currently renders below the profile/statistics cards."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Create Draft 125 redeploy documentation files from the existing template patterns, explicitly stating there were no functional/UI/schema/state changes.",
+      "summary": "Remove all user-facing bug/debug UI controls and ensure the debug overlay is never rendered across any app state.",
       "acceptanceCriteria": [
-        "frontend/REBUILD_DEPLOY_DRAFT_125.md exists and follows the structure/pattern of prior REBUILD_DEPLOY_DRAFT_*.md files, referencing Draft Version 125 and 'Code Changes: None'.",
-        "frontend/REDEPLOY_NOTE_DRAFT_125.md exists and follows the pattern of prior REDEPLOY_NOTE_DRAFT_*.md files for Draft 125.",
-        "frontend/SMOKE_CHECK_DRAFT_125.md exists and follows the pattern of prior SMOKE_CHECK_DRAFT_*.md files for Draft 125."
+        "There is no Bug icon button in the header and no user-facing control labeled or intended for debug mode.",
+        "The debug overlay is not rendered anywhere in the application UI across all authentication/initialization states.",
+        "App functionality unrelated to debug UI (login, profile setup, dashboard navigation) continues to work without requiring debug-mode localStorage flags or page reloads."
       ],
       "file_operations": [
         {
-          "path": "frontend/REBUILD_DEPLOY_DRAFT_125.md",
-          "operation": "create",
-          "description": "Create a Draft Version 125 clean rebuild/redeploy doc matching the structure of prior REBUILD_DEPLOY_DRAFT_*.md files, explicitly stating: Migration Required: No; Code Changes: None; no functional/UI/schema/state changes."
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Remove the Bug icon import and the debug toggle button/handler so no debug-mode toggle is exposed in the header UI."
         },
         {
-          "path": "frontend/REDEPLOY_NOTE_DRAFT_125.md",
-          "operation": "create",
-          "description": "Create a Draft Version 125 redeploy note file following the pattern of prior REDEPLOY_NOTE_DRAFT_*.md files, including placeholders for date/time, network, canister IDs/URL, steps executed, and a clear statement that there were no functional/UI/schema/state changes."
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Remove DebugOverlay import and stop rendering the debug overlay in all app states (initializing, login, actor-connecting, profile-loading, profile-setup, loaded, fallback) so the overlay never appears."
         },
         {
-          "path": "frontend/SMOKE_CHECK_DRAFT_125.md",
-          "operation": "create",
-          "description": "Create a Draft Version 125 smoke check checklist following the pattern of prior SMOKE_CHECK_DRAFT_*.md files, covering app load, Internet Identity login, and dashboard render after profile availability, with spaces to record results and errors."
+          "path": "frontend/src/components/DebugOverlay.tsx",
+          "operation": "delete",
+          "description": "Delete the debug overlay component implementation to fully remove the user-facing debug panel from the codebase (ensuring no remaining imports/usages exist after App.tsx is updated)."
         }
       ]
     }

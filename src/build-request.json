@@ -1,55 +1,55 @@
 {
   "kind": "build_request",
-  "title": "Create new draft and redeploy the same version (no code changes)",
+  "title": "Move Training Heat Map into Training Statistics card and remove debug/bug UI features",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Create a new Caffeine draft and deploy the exact same application version currently deployed (Version 125) with no changes to backend or frontend source code and no state/schema migrations.",
-      "target": "unknown",
+      "text": "Move the existing Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` so it appears inside the \"Training Statistics\" card, positioned directly under the 6 metric tiles, while keeping the heat map’s current functionality and sizing (same grid cell size, same scroll behavior, same year selector/legend behavior, same computed totals). Remove the standalone \"Training Heat Map\" section that currently renders below the profile/statistics cards.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3",
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "create a new draft and deploy the same version — no code edits needed."
+          "Can we move the Training Heat Map into the Training Statistics area under the 6 metrics keeping the same functionality/sizing as now."
         ]
       },
       "acceptanceCriteria": [
-        "A new draft is created and deployed successfully.",
-        "Deployment uses the same code as Version 125 (no source code edits).",
-        "No backend migration is executed/required as part of this redeploy.",
-        "The deployed app loads and is usable (basic smoke verification: app loads, Internet Identity login works, dashboard renders after profile is available)."
+        "On the Profile Analytics tab, the Training Heat Map is rendered within the \"Training Statistics\" card, beneath the 6 metric tiles.",
+        "The Training Heat Map no longer appears as a separate section outside/below the statistics card.",
+        "Heat map behavior is unchanged: year navigation (prev/next + dropdown), day selection, legend, theme-aware coloring updates, and loading state work as they did previously.",
+        "Heat map sizing is unchanged: day cells remain 12px squares (`w-3 h-3`), and the grid retains its current overflow/scroll behavior."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add new deployment documentation for this redeploy by creating Draft 125 versions of the existing templates: frontend/REBUILD_DEPLOY_DRAFT_125.md, frontend/REDEPLOY_NOTE_DRAFT_125.md, and frontend/SMOKE_CHECK_DRAFT_125.md, explicitly stating that there were no functional/UI/schema/state changes.",
+      "text": "Remove the \"bug\"/debug features from the user-facing UI: remove the debug toggle button (Bug icon) from `frontend/src/components/Header.tsx` and stop rendering the debug overlay from `frontend/src/App.tsx` in all app states (initializing, login, actor-connecting, profile-loading, profile-setup, loaded, fallback).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3",
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "create a new draft and deploy the same version — no code edits needed."
+          "Also remove the bugs features elsewhere."
         ]
       },
       "acceptanceCriteria": [
-        "frontend/REBUILD_DEPLOY_DRAFT_125.md exists and follows the structure/pattern of prior REBUILD_DEPLOY_DRAFT_*.md files, referencing Draft Version 125 and 'Code Changes: None'.",
-        "frontend/REDEPLOY_NOTE_DRAFT_125.md exists and follows the pattern of prior REDEPLOY_NOTE_DRAFT_*.md files for Draft 125.",
-        "frontend/SMOKE_CHECK_DRAFT_125.md exists and follows the pattern of prior SMOKE_CHECK_DRAFT_*.md files for Draft 125."
+        "There is no Bug icon button in the header and no user-facing control labeled or intended for debug mode.",
+        "The debug overlay is not rendered anywhere in the application UI across all authentication/initialization states.",
+        "App functionality unrelated to debug UI (login, profile setup, dashboard navigation) continues to work without requiring debug-mode localStorage flags or page reloads."
       ]
     }
   ],
   "constraints": [
-    "Do not modify backend/main.mo, backend/migration.mo, or any application source code for this request.",
-    "Do not introduce new features or UI changes; this is a clean rebuild/redeploy only."
+    "Do not change backend APIs or data schemas; this request is a UI/layout change plus removal of user-facing debug UI.",
+    "Do not edit files under `frontend/src/components/ui` (read-only UI library components).",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Fixing existing known issues (e.g., RBAC traps, env var misconfiguration risks, missing mood icon filenames).",
-    "Any refactors, dependency upgrades, or design changes."
+    "Do not redesign the Training Heat Map visualization or change its calculations, thresholds, or color palette logic.",
+    "Do not add new analytics metrics or new dashboard tabs.",
+    "Do not implement new debugging features; the request is to remove existing bug/debug features from the UI."
   ],
   "imageRequirements": {
     "required": [],

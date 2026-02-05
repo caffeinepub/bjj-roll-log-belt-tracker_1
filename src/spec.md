@@ -1,14 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Create a new Caffeine draft and redeploy the exact same currently deployed application version (Version 125) with no code or migration changes.
+**Goal:** Place the existing Training Heat Map inside the “Training Statistics” card and remove user-facing debug/bug UI elements.
 
 **Planned changes:**
-- Create a new draft and deploy using the same code as Version 125 (no backend/frontend source changes; no state/schema migrations).
-- Add redeploy documentation by creating Draft 125 versions of existing templates:
-  - frontend/REBUILD_DEPLOY_DRAFT_125.md
-  - frontend/REDEPLOY_NOTE_DRAFT_125.md
-  - frontend/SMOKE_CHECK_DRAFT_125.md
-  Each should explicitly state there were no functional/UI/schema/state changes.
+- Move the current Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` into the “Training Statistics” card, positioned directly under the 6 metric tiles, keeping all existing functionality and sizing/scroll behavior unchanged.
+- Remove the standalone “Training Heat Map” section that currently renders below/outside the profile/statistics cards.
+- Remove the debug toggle (Bug icon) from `frontend/src/components/Header.tsx` and stop rendering the debug overlay from `frontend/src/App.tsx` across all app states.
 
-**User-visible outcome:** The app is redeployed as the same Version 125 build and remains usable (app loads, Internet Identity login works, and the dashboard renders after the profile is available).
+**User-visible outcome:** On the Profile Analytics tab, the heat map appears within the Training Statistics card beneath the metrics, and all debug/bug UI controls/overlays are no longer visible anywhere in the app.
