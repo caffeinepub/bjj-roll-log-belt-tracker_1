@@ -1,55 +1,94 @@
 {
   "kind": "build_request",
-  "title": "Move Training Heat Map into Training Statistics card and remove debug/bug UI features",
+  "title": "Add animated Google Lens-style multicolor gradient glow highlights to specified UI elements",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Move the existing Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` so it appears inside the \"Training Statistics\" card, positioned directly under the 6 metric tiles, while keeping the heat map’s current functionality and sizing (same grid cell size, same scroll behavior, same year selector/legend behavior, same computed totals). Remove the standalone \"Training Heat Map\" section that currently renders below the profile/statistics cards.",
+      "text": "Implement an animated, Google Lens-style multicolor gradient glow highlight (blue → green → yellow → red tones) that works in both light and dark themes, and expose it as reusable styling (Tailwind utilities and/or CSS utility classes) so it can be applied consistently to the specified UI elements only.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Can we move the Training Heat Map into the Training Statistics area under the 6 metrics keeping the same functionality/sizing as now."
+          "Colour Design - I want add more colour to the app in the style of a modern, sleek, start up with Google “Lens-style” highlight theme.",
+          "1. Yes",
+          "2. Both"
         ]
       },
       "acceptanceCriteria": [
-        "On the Profile Analytics tab, the Training Heat Map is rendered within the \"Training Statistics\" card, beneath the 6 metric tiles.",
-        "The Training Heat Map no longer appears as a separate section outside/below the statistics card.",
-        "Heat map behavior is unchanged: year navigation (prev/next + dropdown), day selection, legend, theme-aware coloring updates, and loading state work as they did previously.",
-        "Heat map sizing is unchanged: day cells remain 12px squares (`w-3 h-3`), and the grid retains its current overflow/scroll behavior."
+        "A visible multicolor gradient glow effect animates subtly over time (not static).",
+        "The effect renders appropriately in both light mode and dark mode (no unreadable text, no extreme bloom that reduces contrast).",
+        "The effect is available as a reusable class or small set of classes that can be applied to multiple components without duplicating large style blocks."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Remove the \"bug\"/debug features from the user-facing UI: remove the debug toggle button (Bug icon) from `frontend/src/components/Header.tsx` and stop rendering the debug overlay from `frontend/src/App.tsx` in all app states (initializing, login, actor-connecting, profile-loading, profile-setup, loaded, fallback).",
+      "text": "Update the header branding area to use the animated Google Lens-style gradient glow styling ONLY for: (a) the “Jiu-Jitsu Journey” name text, and (b) the Profile button (desktop profile button in the header). Do not apply the new glow styling to other header controls (theme toggle, logout, etc.).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Also remove the bugs features elsewhere."
+          "Only apply changes to the following: 1. In the header - Jiu-Jitsu Journey name, Profile Button"
         ]
       },
       "acceptanceCriteria": [
-        "There is no Bug icon button in the header and no user-facing control labeled or intended for debug mode.",
-        "The debug overlay is not rendered anywhere in the application UI across all authentication/initialization states.",
-        "App functionality unrelated to debug UI (login, profile setup, dashboard navigation) continues to work without requiring debug-mode localStorage flags or page reloads."
+        "In the header, the “Jiu-Jitsu Journey” title shows the animated multicolor glow highlight.",
+        "The desktop Profile button (username button) shows the animated multicolor glow highlight.",
+        "Theme toggle and Logout button styling remain unchanged compared to current behavior (aside from any incidental layout shifts that must be avoided)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Update the dashboard tab navigation so that ONLY the selected tab buttons (Profile Analytics, Training Log, Belt Tracker, Techniques) use the animated Google Lens-style multicolor gradient as the entire button background, in both light and dark themes. Non-selected tabs must keep their current styling (no multicolor gradient background).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "2. The tab buttons that are selected (Profile Analytics, Training Logs, Belt Tracker, Techniques)",
+          "3. The Entire Button"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When a tab is active/selected, its full background shows the animated multicolor gradient (not just an outline).",
+        "When a tab is not active, it does not show the multicolor gradient background/glow.",
+        "Switching tabs updates the highlighted styling immediately and reliably."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Update the welcome/login page to apply the animated Google Lens-style multicolor gradient glow styling ONLY to: (a) the BJJ icon at the top of the page, (b) the “Login with Internet Identity” button, and (c) the four rounded areas on the welcome page (the rounded info panel inside the Welcome card and the three rounded feature tiles). Ensure the page remains readable and accessible in both light and dark themes.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "3. For the welcome page - The BJJ Icon, The sign in with internet Identity Button, and the 4 rounded area on the welcome page."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The top BJJ icon shows the animated multicolor glow highlight.",
+        "The “Login with Internet Identity” button shows the animated multicolor glow highlight.",
+        "Exactly four rounded areas on the welcome page show the animated multicolor styling: the rounded info panel under the login button and the three feature tiles at the bottom.",
+        "Other welcome page elements keep their current styling (no additional areas pick up the multicolor glow unintentionally)."
       ]
     }
   ],
   "constraints": [
-    "Do not change backend APIs or data schemas; this request is a UI/layout change plus removal of user-facing debug UI.",
-    "Do not edit files under `frontend/src/components/ui` (read-only UI library components).",
-    "Use English for any user-facing text."
+    "Do not edit any files under frontend/src/components/ui (they must be composed/used via props and className rather than modified).",
+    "Apply visual changes ONLY to the user-specified elements in the header, selected dashboard tabs, and the welcome/login page elements listed by the user.",
+    "All user-facing text must remain in English."
   ],
   "nonGoals": [
-    "Do not redesign the Training Heat Map visualization or change its calculations, thresholds, or color palette logic.",
-    "Do not add new analytics metrics or new dashboard tabs.",
-    "Do not implement new debugging features; the request is to remove existing bug/debug features from the UI."
+    "No backend (Motoko) changes or schema changes.",
+    "No new pages, flows, or feature additions beyond the requested visual styling updates.",
+    "No changes to non-selected tabs or other buttons/components outside the explicitly listed targets."
   ],
   "imageRequirements": {
     "required": [],

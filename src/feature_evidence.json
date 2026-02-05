@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-move-the-existing-training-heat-map-rendering-in-frontend-src-components-profileanalytics-tsx-so-it-appears-inside-the-training-statistics-card-positioned-directly-under-the-6-metric-tiles-while-keeping-the-heat-map-s-current-functionality-and-sizing-same-grid-cell-size-same-scroll-behavior-same-year-selector-legend-behavior-same-computed-totals-remove-the-standalone-training-heat-map-section-that-currently-renders-below-the-profile-statistics-cards",
-      "featureTitle": "Move the existing Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` so it appears inside the \"Training Statistics\" card, positioned directly under the 6 metric tiles, while keeping the heat map’s current functionality and sizing (same grid cell size, same scroll behavior, same year selector/legend behavior, same computed totals). Remove the standalone \"Training Heat Map\" section that currently renders below the profile/statistics cards.",
+      "featureId": "feature-implement-an-animated-google-lens-style-multicolor-gradient-glow-highlight-blue-green-yellow-red-tones-that-works-in-both-light-and-dark-themes-and-expose-it-as-reusable-styling-tailwind-utilities-and-or-css-utility-classes-so-it-can-be-applied-consistently-to-the-specified-ui-elements-only",
+      "featureTitle": "Implement an animated, Google Lens-style multicolor gradient glow highlight (blue → green → yellow → red tones) that works in both light and dark themes, and expose it as reusable styling (Tailwind utilities and/or CSS utility classes) so it can be applied consistently to the specified UI elements only.",
       "files": [
-        "frontend/src/components/ProfileAnalytics.tsx",
-        "frontend/src/components/TrainingHeatMap.tsx"
+        "frontend/src/index.css"
       ],
       "components": [
         "authorization@4.0.0",
@@ -23,11 +22,9 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-remove-the-bug-debug-features-from-the-user-facing-ui-remove-the-debug-toggle-button-bug-icon-from-frontend-src-components-header-tsx-and-stop-rendering-the-debug-overlay-from-frontend-src-app-tsx-in-all-app-states-initializing-login-actor-connecting-profile-loading-profile-setup-loaded-fallback",
-      "featureTitle": "Remove the \"bug\"/debug features from the user-facing UI: remove the debug toggle button (Bug icon) from `frontend/src/components/Header.tsx` and stop rendering the debug overlay from `frontend/src/App.tsx` in all app states (initializing, login, actor-connecting, profile-loading, profile-setup, loaded, fallback).",
+      "featureId": "feature-update-the-header-branding-area-to-use-the-animated-google-lens-style-gradient-glow-styling-only-for-a-the-jiu-jitsu-journey-name-text-and-b-the-profile-button-desktop-profile-button-in-the-header-do-not-apply-the-new-glow-styling-to-other-header-controls-theme-toggle-logout-etc",
+      "featureTitle": "Update the header branding area to use the animated Google Lens-style gradient glow styling ONLY for: (a) the “Jiu-Jitsu Journey” name text, and (b) the Profile button (desktop profile button in the header). Do not apply the new glow styling to other header controls (theme toggle, logout, etc.).",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/DebugOverlay.tsx",
         "frontend/src/components/Header.tsx"
       ],
       "components": [
@@ -41,6 +38,47 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-dashboard-tab-navigation-so-that-only-the-selected-tab-buttons-profile-analytics-training-log-belt-tracker-techniques-use-the-animated-google-lens-style-multicolor-gradient-as-the-entire-button-background-in-both-light-and-dark-themes-non-selected-tabs-must-keep-their-current-styling-no-multicolor-gradient-background",
+      "featureTitle": "Update the dashboard tab navigation so that ONLY the selected tab buttons (Profile Analytics, Training Log, Belt Tracker, Techniques) use the animated Google Lens-style multicolor gradient as the entire button background, in both light and dark themes. Non-selected tabs must keep their current styling (no multicolor gradient background).",
+      "files": [
+        "frontend/src/index.css",
+        "frontend/src/pages/Dashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-welcome-login-page-to-apply-the-animated-google-lens-style-multicolor-gradient-glow-styling-only-to-a-the-bjj-icon-at-the-top-of-the-page-b-the-login-with-internet-identity-button-and-c-the-four-rounded-areas-on-the-welcome-page-the-rounded-info-panel-inside-the-welcome-card-and-the-three-rounded-feature-tiles-ensure-the-page-remains-readable-and-accessible-in-both-light-and-dark-themes",
+      "featureTitle": "Update the welcome/login page to apply the animated Google Lens-style multicolor gradient glow styling ONLY to: (a) the BJJ icon at the top of the page, (b) the “Login with Internet Identity” button, and (c) the four rounded areas on the welcome page (the rounded info panel inside the Welcome card and the three rounded feature tiles). Ensure the page remains readable and accessible in both light and dark themes.",
+      "files": [
+        "frontend/src/components/LoginScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

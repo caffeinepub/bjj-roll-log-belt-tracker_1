@@ -13,19 +13,19 @@ export default function Dashboard() {
     <div className="container py-8">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-          <TabsTrigger value="profile-analytics" className="gap-2">
+          <TabsTrigger value="profile-analytics" className="gap-2 data-[state=active]:lens-gradient-bg">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profile Analytics</span>
           </TabsTrigger>
-          <TabsTrigger value="log" className="gap-2">
+          <TabsTrigger value="log" className="gap-2 data-[state=active]:lens-gradient-bg">
             <Activity className="h-4 w-4" />
             <span className="hidden sm:inline">Training Log</span>
           </TabsTrigger>
-          <TabsTrigger value="belt" className="gap-2">
+          <TabsTrigger value="belt" className="gap-2 data-[state=active]:lens-gradient-bg">
             <span className="text-lg">🥋</span>
             <span className="hidden sm:inline">Belt Tracker</span>
           </TabsTrigger>
-          <TabsTrigger value="techniques" className="gap-2">
+          <TabsTrigger value="techniques" className="gap-2 data-[state=active]:lens-gradient-bg">
             <BookOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Techniques</span>
           </TabsTrigger>

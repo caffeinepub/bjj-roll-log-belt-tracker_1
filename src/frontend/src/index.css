@@ -34,6 +34,12 @@
         --bjj-blue: 0.55 0.18 240;
         --bjj-purple: 0.50 0.20 290;
         --bjj-brown: 0.45 0.10 40;
+        
+        /* Google Lens-style gradient colors */
+        --lens-blue: 0.60 0.22 240;
+        --lens-green: 0.70 0.20 150;
+        --lens-yellow: 0.80 0.18 90;
+        --lens-red: 0.65 0.22 25;
     }
 
     .dark {
@@ -66,6 +72,12 @@
         --bjj-blue: 0.60 0.20 240;
         --bjj-purple: 0.55 0.22 290;
         --bjj-brown: 0.50 0.12 40;
+        
+        /* Google Lens-style gradient colors for dark mode (slightly muted) */
+        --lens-blue: 0.55 0.20 240;
+        --lens-green: 0.65 0.18 150;
+        --lens-yellow: 0.75 0.16 90;
+        --lens-red: 0.60 0.20 25;
     }
 
     * {
@@ -73,6 +85,19 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/* Google Lens-style animated gradient keyframes */
+@keyframes lens-glow-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
     }
 }
 
@@ -104,6 +129,125 @@
     .to-bjj-brown {
         --tw-gradient-to: oklch(var(--bjj-brown));
     }
+    
+    /* Google Lens-style text glow for titles/branding */
+    .lens-text-glow {
+        background: linear-gradient(
+            90deg,
+            oklch(var(--lens-blue)),
+            oklch(var(--lens-green)),
+            oklch(var(--lens-yellow)),
+            oklch(var(--lens-red)),
+            oklch(var(--lens-blue))
+        );
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: lens-glow-shift 8s ease-in-out infinite;
+    }
+    
+    /* Google Lens-style full-surface animated gradient background */
+    .lens-gradient-bg {
+        background: linear-gradient(
+            135deg,
+            oklch(var(--lens-blue)),
+            oklch(var(--lens-green)),
+            oklch(var(--lens-yellow)),
+            oklch(var(--lens-red)),
+            oklch(var(--lens-blue))
+        );
+        background-size: 300% 300%;
+        animation: lens-glow-shift 8s ease-in-out infinite;
+        color: white;
+    }
+    
+    /* Google Lens-style subtle surface glow for panels/tiles */
+    .lens-surface-glow {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .lens-surface-glow::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 2px;
+        background: linear-gradient(
+            135deg,
+            oklch(var(--lens-blue)),
+            oklch(var(--lens-green)),
+            oklch(var(--lens-yellow)),
+            oklch(var(--lens-red)),
+            oklch(var(--lens-blue))
+        );
+        background-size: 300% 300%;
+        animation: lens-glow-shift 8s ease-in-out infinite;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+    
+    /* Google Lens-style glow for profile button */
+    .lens-profile-glow {
+        position: relative;
+        background: linear-gradient(
+            135deg,
+            oklch(var(--lens-blue) / 0.15),
+            oklch(var(--lens-green) / 0.15),
+            oklch(var(--lens-yellow) / 0.15),
+            oklch(var(--lens-red) / 0.15),
+            oklch(var(--lens-blue) / 0.15)
+        );
+        background-size: 300% 300%;
+        animation: lens-glow-shift 8s ease-in-out infinite;
+        border: 1px solid transparent;
+        background-clip: padding-box;
+    }
+    
+    .lens-profile-glow::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: linear-gradient(
+            135deg,
+            oklch(var(--lens-blue)),
+            oklch(var(--lens-green)),
+            oklch(var(--lens-yellow)),
+            oklch(var(--lens-red)),
+            oklch(var(--lens-blue))
+        );
+        background-size: 300% 300%;
+        animation: lens-glow-shift 8s ease-in-out infinite;
+        z-index: -1;
+        opacity: 0.6;
+    }
+    
+    .dark .lens-profile-glow::before {
+        opacity: 0.5;
+    }
+    
+    /* Google Lens-style glow for icon container */
+    .lens-icon-glow {
+        background: linear-gradient(
+            135deg,
+            oklch(var(--lens-blue)),
+            oklch(var(--lens-green)),
+            oklch(var(--lens-yellow)),
+            oklch(var(--lens-red)),
+            oklch(var(--lens-blue))
+        );
+        background-size: 300% 300%;
+        animation: lens-glow-shift 8s ease-in-out infinite;
+        box-shadow: 0 4px 20px oklch(var(--lens-blue) / 0.3);
+    }
+    
+    .dark .lens-icon-glow {
+        box-shadow: 0 4px 20px oklch(var(--lens-blue) / 0.4);
+    }
 }
 
 /* Heat map cell border radius override */
@@ -111,7 +255,60 @@
     border-radius: 2px;
 }
 
-/* Heat map container with minimal scrollbar styling and full scrollability */
+/* Heat map scroll wrapper - contains only the grid+labels, allows horizontal scrolling on small screens */
+.heat-map-scroll-wrapper {
+    /* Enable smooth horizontal scrolling */
+    overflow-x: auto;
+    overflow-y: visible;
+    
+    /* Smooth scrolling on touch devices */
+    -webkit-overflow-scrolling: touch;
+    
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    
+    /* Add small padding for scrollbar spacing */
+    padding-bottom: 4px;
+}
+
+.dark .heat-map-scroll-wrapper {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.heat-map-scroll-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.heat-map-scroll-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.heat-map-scroll-wrapper::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.dark .heat-map-scroll-wrapper::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.heat-map-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.dark .heat-map-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Heat map grid container - maintains fixed cell sizing */
+.heat-map-grid-container {
+    /* Prevent shrinking of cells */
+    flex-shrink: 0;
+}
+
+/* Legacy heat map container class - kept for backward compatibility */
 .heat-map-container {
     /* Firefox */
     scrollbar-width: thin;

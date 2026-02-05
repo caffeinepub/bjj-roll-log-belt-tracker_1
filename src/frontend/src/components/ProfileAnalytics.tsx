@@ -68,19 +68,19 @@ export default function ProfileAnalytics() {
     : 'N/A';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Profile Analytics</h2>
         <p className="text-muted-foreground">Your training journey and achievements</p>
       </div>
 
       {/* Profile Section */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-1 border-2">
+      <div className="grid gap-6 lg:grid-cols-3 w-full">
+        <Card className="lg:col-span-1 border-2 min-w-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-bjj-blue" />
-              Profile
+              <User className="h-5 w-5 text-bjj-blue flex-shrink-0" />
+              <span className="truncate">Profile</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -95,9 +95,9 @@ export default function ProfileAnalytics() {
                 fallback="/assets/generated/profile-avatar-placeholder.dim_256x256.png"
                 className="h-24 w-24 rounded-full object-cover border-4 border-gradient-to-br from-bjj-blue to-bjj-purple"
               />
-              <div>
-                <h3 className="text-2xl font-bold">{userProfile.username}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
+              <div className="min-w-0 w-full">
+                <h3 className="text-2xl font-bold truncate">{userProfile.username}</h3>
+                <p className="text-sm text-muted-foreground mt-1 truncate">
                   {getBeltName(userProfile.beltProgress.belt)}
                 </p>
               </div>
@@ -119,13 +119,13 @@ export default function ProfileAnalytics() {
 
             {/* Gym Information */}
             {userProfile.gym && (
-              <div className="space-y-3 pt-2 border-t">
-                <div className="flex items-start gap-3">
+              <div className="space-y-3 pt-2 border-t min-w-0">
+                <div className="flex items-start gap-3 min-w-0">
                   {userProfile.gym.logoUrl && (
                     <CachedImage
                       src={userProfile.gym.logoUrl}
                       alt="Gym logo"
-                      className="h-10 w-10 object-contain rounded"
+                      className="h-10 w-10 object-contain rounded flex-shrink-0"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
@@ -133,13 +133,13 @@ export default function ProfileAnalytics() {
                   )}
                   <div className="flex-1 min-w-0">
                     {userProfile.gym.name && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
                         <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span className="font-medium text-sm truncate">{userProfile.gym.name}</span>
                       </div>
                     )}
                     {userProfile.gym.location && (
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1 min-w-0">
                         <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span className="text-sm text-muted-foreground truncate">{userProfile.gym.location}</span>
                       </div>
@@ -150,76 +150,76 @@ export default function ProfileAnalytics() {
             )}
 
             <div className="space-y-2 text-sm pt-2 border-t">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Practitioner Since</span>
-                <span className="font-medium">{practitionerSince}</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-muted-foreground flex-shrink-0">Practitioner Since</span>
+                <span className="font-medium truncate">{practitionerSince}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 border-2">
+        <Card className="lg:col-span-2 border-2 min-w-0 w-full max-w-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-bjj-purple" />
-              Training Statistics
+              <TrendingUp className="h-5 w-5 text-bjj-purple flex-shrink-0" />
+              <span className="truncate">Training Statistics</span>
             </CardTitle>
-            <CardDescription>Your training journey at a glance</CardDescription>
+            <CardDescription className="truncate">Your training journey at a glance</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-lg border-2 p-4 space-y-2">
+          <CardContent className="min-w-0 w-full">
+            <div className="grid gap-4 grid-cols-2 lg:grid-cols-3 w-full">
+              <div className="rounded-lg border-2 p-4 space-y-2 min-w-0">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span className="text-sm font-medium">Total Sessions</span>
+                  <Calendar className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm font-medium truncate">Total Sessions</span>
                 </div>
-                <p className="text-3xl font-bold">{totalSessions}</p>
-                <p className="text-xs text-muted-foreground">Training sessions logged</p>
+                <p className="text-3xl font-bold truncate">{totalSessions}</p>
+                <p className="text-xs text-muted-foreground truncate">Training sessions logged</p>
               </div>
 
-              <div className="rounded-lg border-2 p-4 space-y-2">
+              <div className="rounded-lg border-2 p-4 space-y-2 min-w-0">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span className="text-sm font-medium">Total Training Time</span>
+                  <Clock className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm font-medium truncate">Total Training Time</span>
                 </div>
-                <p className="text-3xl font-bold">{totalHours}h</p>
-                <p className="text-xs text-muted-foreground">{totalMinutes} minutes total</p>
+                <p className="text-3xl font-bold truncate">{totalHours}h</p>
+                <p className="text-xs text-muted-foreground truncate">{totalMinutes} minutes total</p>
               </div>
 
-              <div className="rounded-lg border-2 p-4 space-y-2">
+              <div className="rounded-lg border-2 p-4 space-y-2 min-w-0">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Target className="h-4 w-4" />
-                  <span className="text-sm font-medium">Total Rolls</span>
+                  <Target className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm font-medium truncate">Total Rolls</span>
                 </div>
-                <p className="text-3xl font-bold">{totalRolls}</p>
-                <p className="text-xs text-muted-foreground">Sparring rounds completed</p>
+                <p className="text-3xl font-bold truncate">{totalRolls}</p>
+                <p className="text-xs text-muted-foreground truncate">Sparring rounds completed</p>
               </div>
 
-              <div className="rounded-lg border-2 p-4 space-y-2">
+              <div className="rounded-lg border-2 p-4 space-y-2 min-w-0">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Award className="h-4 w-4" />
-                  <span className="text-sm font-medium">Submissions Learned</span>
+                  <Award className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm font-medium truncate">Submissions Learned</span>
                 </div>
-                <p className="text-3xl font-bold">{submissionsLearned}</p>
-                <p className="text-xs text-muted-foreground">Unique submissions (blue+)</p>
+                <p className="text-3xl font-bold truncate">{submissionsLearned}</p>
+                <p className="text-xs text-muted-foreground truncate">Unique submissions (blue+)</p>
               </div>
 
-              <div className="rounded-lg border-2 p-4 space-y-2">
+              <div className="rounded-lg border-2 p-4 space-y-2 min-w-0">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="text-sm font-medium">Favorite Theme</span>
+                  <TrendingUp className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm font-medium truncate">Favorite Theme</span>
                 </div>
                 <p className="text-2xl font-bold truncate">{favoriteTheme}</p>
-                <p className="text-xs text-muted-foreground">Most practiced theme</p>
+                <p className="text-xs text-muted-foreground truncate">Most practiced theme</p>
               </div>
 
-              <div className="rounded-lg border-2 p-4 space-y-2">
+              <div className="rounded-lg border-2 p-4 space-y-2 min-w-0">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Zap className="h-4 w-4" />
-                  <span className="text-sm font-medium">Average Intensity</span>
+                  <Zap className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm font-medium truncate">Average Intensity</span>
                 </div>
                 <p className="text-2xl font-bold truncate">{averageIntensity}</p>
-                <p className="text-xs text-muted-foreground">Overall session intensity</p>
+                <p className="text-xs text-muted-foreground truncate">Overall session intensity</p>
               </div>
             </div>
 
@@ -231,7 +231,7 @@ export default function ProfileAnalytics() {
 
       {/* Training Goals Section */}
       {userProfile.trainingGoals.length > 0 && (
-        <Card>
+        <Card className="min-w-0 w-full">
           <CardHeader>
             <CardTitle>Training Goals</CardTitle>
             <CardDescription>Your current training objectives</CardDescription>
@@ -239,11 +239,11 @@ export default function ProfileAnalytics() {
           <CardContent>
             <div className="space-y-4">
               {userProfile.trainingGoals.map((goal) => (
-                <div key={goal.id} className="rounded-lg border p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h4 className="font-semibold">{goal.name}</h4>
-                      <p className="text-sm text-muted-foreground">{goal.description}</p>
+                <div key={goal.id} className="rounded-lg border p-4 min-w-0">
+                  <div className="flex items-start justify-between mb-2 gap-4">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-semibold truncate">{goal.name}</h4>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{goal.description}</p>
                     </div>
                   </div>
                   <div className="space-y-2">

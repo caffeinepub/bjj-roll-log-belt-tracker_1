@@ -12,7 +12,7 @@ export default function LoginScreen() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-bjj-blue to-bjj-purple shadow-lg">
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl shadow-lg lens-icon-glow">
             <span className="text-3xl font-bold text-white">BJJ</span>
           </div>
           <div>
@@ -21,7 +21,7 @@ export default function LoginScreen() {
           </div>
         </div>
 
-        <Card className="border-2">
+        <Card className="border-2 lens-surface-glow">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl">Welcome</CardTitle>
             <CardDescription>Sign in to access your training log and track your progress</CardDescription>
@@ -30,7 +30,7 @@ export default function LoginScreen() {
             <Button
               onClick={login}
               disabled={isLoggingIn}
-              className="w-full bg-gradient-to-r from-bjj-blue to-bjj-purple hover:from-bjj-blue/90 hover:to-bjj-purple/90"
+              className="w-full lens-gradient-bg hover:opacity-90"
               size="lg"
             >
               {isLoggingIn ? (
@@ -56,15 +56,15 @@ export default function LoginScreen() {
         </Card>
 
         <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="rounded-lg bg-card p-4 border">
+          <div className="rounded-lg bg-card p-4 lens-surface-glow">
             <div className="text-2xl font-bold text-bjj-blue">📊</div>
             <p className="mt-2 text-xs text-muted-foreground">Track Sessions</p>
           </div>
-          <div className="rounded-lg bg-card p-4 border">
+          <div className="rounded-lg bg-card p-4 lens-surface-glow">
             <div className="text-2xl font-bold text-bjj-purple">🥋</div>
             <p className="mt-2 text-xs text-muted-foreground">Belt Progress</p>
           </div>
-          <div className="rounded-lg bg-card p-4 border">
+          <div className="rounded-lg bg-card p-4 lens-surface-glow">
             <div className="text-2xl font-bold text-bjj-brown">📚</div>
             <p className="mt-2 text-xs text-muted-foreground">Technique Library</p>
           </div>

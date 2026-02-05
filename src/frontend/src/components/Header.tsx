@@ -44,17 +44,17 @@ export default function Header({ onProfileClick }: HeaderProps) {
             <span className="text-xl font-bold text-white">🥋</span>
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg sm:text-xl font-bold tracking-tight truncate">Jiu-Jitsu Journey</h1>
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight truncate lens-text-glow">Jiu-Jitsu Journey</h1>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {isAuthenticated && userProfile && (
             <>
-              {/* Desktop: Full profile button */}
+              {/* Desktop: Full profile button with Lens glow */}
               <button
                 onClick={onProfileClick}
-                className="hidden sm:flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 hover:bg-muted transition-colors cursor-pointer"
+                className="hidden sm:flex items-center gap-2 rounded-lg px-3 py-2 hover:opacity-90 transition-opacity cursor-pointer lens-profile-glow"
               >
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-bjj-blue to-bjj-purple flex items-center justify-center">
                   <span className="text-sm font-semibold text-white">

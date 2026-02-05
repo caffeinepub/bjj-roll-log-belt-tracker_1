@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { INTENSITY_OPTIONS } from '../lib/intensityUtils';
-import { getMoodLabel } from '../lib/moodIcons';
+import { getMoodLabel, getMoodColor, getAllMoodLabels } from '../lib/moodIcons';
 
 interface AddTrainingDialogProps {
   open: boolean;
@@ -38,16 +38,6 @@ const SESSION_THEMES: { value: SessionTheme; label: string }[] = [
 ];
 
 const QUICK_DURATIONS = [0.5, 1, 1.5, 2];
-const MOOD_LABELS_LIST = ['Tough', 'Hard', 'Okay', 'Good', 'Great'];
-
-// Mood color mapping
-const MOOD_COLORS: Record<string, string> = {
-  'Tough': '#d51818',
-  'Hard': '#ff5f2f',
-  'Okay': '#f9a217',
-  'Good': '#f0dc04',
-  'Great': '#74d601',
-};
 
 export default function AddTrainingDialog({ open, onOpenChange, editingSession }: AddTrainingDialogProps) {
   const [date, setDate] = useState<Date>(new Date());
@@ -63,6 +53,8 @@ export default function AddTrainingDialog({ open, onOpenChange, editingSession }
   const saveMutation = useSaveTrainingRecords();
   const { data: sessions = [] } = useGetTrainingRecords();
   const { data: userProfile } = useGetCallerUserProfile();
+
+  const MOOD_LABELS_LIST = getAllMoodLabels();
 
   useEffect(() => {
     if (editingSession) {
@@ -117,9 +109,7 @@ export default function AddTrainingDialog({ open, onOpenChange, editingSession }
   };
 
   const getCurrentMoodColor = (): string => {
-    const moodIndex = getSelectedMoodIndex(moodRating);
-    const moodLabel = MOOD_LABELS_LIST[moodIndex];
-    return MOOD_COLORS[moodLabel] || '#f9a217';
+    return getMoodColor(moodRating);
   };
 
   const handleSubmit = (e: React.FormEvent) => {

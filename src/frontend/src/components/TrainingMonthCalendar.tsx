@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getIntensityLabel, getIntensityBadgeColor } from '../lib/intensityUtils';
 import { formatSessionTheme } from '../lib/formatters';
-import { getMoodIcon } from '../lib/moodIcons';
+import { getMoodLabel, getMoodColor } from '../lib/moodIcons';
 import { useDragToScroll } from '../hooks/useDragToScroll';
 import type { TrainingSession } from '../backend';
 
@@ -263,7 +263,8 @@ export default function TrainingMonthCalendar({ sessions, onEditSession }: Train
               >
                 {currentMonthSessions.map(({ date, session }, idx) => {
                   const isHighlighted = highlightedSessionId === session.id;
-                  const moodIcon = getMoodIcon(session.moodRating);
+                  const moodLabel = getMoodLabel(session.moodRating);
+                  const moodColor = getMoodColor(session.moodRating);
                   
                   return (
                     <div
@@ -330,15 +331,18 @@ export default function TrainingMonthCalendar({ sessions, onEditSession }: Train
                         <Badge variant="outline" className="text-xs">
                           {formatSessionTheme(session.sessionTheme)}
                         </Badge>
-                        {/* Mood Icon */}
-                        <div className="flex items-center gap-1">
-                          <img
-                            src={moodIcon.src}
-                            alt={moodIcon.alt}
-                            className="w-5 h-5 rounded-xl"
-                            title={moodIcon.alt}
-                          />
-                        </div>
+                        {/* Mood Label Badge */}
+                        <Badge
+                          variant="outline"
+                          className="text-xs font-medium"
+                          style={{
+                            backgroundColor: `${moodColor}15`,
+                            color: moodColor,
+                            borderColor: moodColor,
+                          }}
+                        >
+                          {moodLabel}
+                        </Badge>
                       </div>
                     </div>
                   );

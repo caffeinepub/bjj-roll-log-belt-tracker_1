@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 6,
+  "projectStateVersion": 39,
   "summary": "Jiu-Jitsu Journey is an Internet Computer (ICP) dapp for Brazilian Jiu-Jitsu practitioners. Users authenticate with Internet Identity, create and edit a profile (belt/stripes, optional avatar, gym info, practitioner-since date), log and edit training sessions (date, duration, gi/no-gi, theme, intensity, rolls, mood), track belt progression with client-side gamified stats, maintain a multi-belt submission log (submissions landed vs opponent belt), build a personal technique library, and visualize activity via a month calendar, analytics charts, and GitHub-style yearly heat maps (including an editable training-hours override heat map). The backend is a Motoko canister with RBAC plus optional Caffeine blob-storage maintenance/cycles refill endpoints.",
   "existing_features": [
     {
@@ -396,18 +396,113 @@
       "version": 1
     },
     {
-      "id": "feature-move-the-existing-training-heat-map-rendering-in-frontend-src-components-profileanalytics-tsx-so-it-appears-inside-the-training-statistics-card-positioned-directly-under-the-6-metric-tiles-while-keeping-the-heat-map-s-current-functionality-and-sizing-same-grid-cell-size-same-scroll-behavior-same-year-selector-legend-behavior-same-computed-totals-remove-the-standalone-training-heat-map-section-that-currently-renders-below-the-profile-statistics-cards",
-      "title": "Move the existing Training Heat Map rendering in `frontend/src/components/ProfileAnalytics.tsx` so it appears inside the \"Training Statistics\" card, positioned directly under the 6 metric tiles, while keeping the heat map’s current functionality and sizing (same grid cell size, same scroll behavior, same year selector/legend behavior, same computed totals). Remove the standalone \"Training Heat Map\" section that currently renders below the profile/statistics cards.",
+      "id": "IF-33",
+      "title": "Profile view component (read-only summary + entry point to edit)",
+      "synonyms": [
+        "Profile.tsx",
+        "ProfileAnalytics"
+      ],
+      "description": "Implements the previously-empty Profile component to render the user profile information and related profile-level analytics/summary UI, complementing ProfileSetup (edit) and header-driven edit mode.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-34",
+      "title": "Analytics page/component implementation",
+      "synonyms": [
+        "Analytics.tsx"
+      ],
+      "description": "Implements the previously-empty Analytics component/page to display analytics content (integrating existing training analytics utilities and charts).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-35",
+      "title": "Submission tag input component",
+      "synonyms": [
+        "SubmissionTagInput.tsx"
+      ],
+      "description": "Implements the previously-empty SubmissionTagInput component for tag-style entry/selection of submissions used by the submission logging UI.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-36",
+      "title": "Actor readiness hook",
+      "synonyms": [
+        "useActorReady.ts"
+      ],
+      "description": "Implements the previously-empty useActorReady hook to provide a focused readiness/status signal for backend actor initialization (usable by components needing a simple ready gate).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-37",
+      "title": "Submission options/list loader utility",
+      "synonyms": [
+        "submissionsListLoader.ts",
+        "submissionOptions"
+      ],
+      "description": "Implements the previously-empty submissions list loader utility to provide/prepare the selectable submission options used by submission-related inputs.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-38",
+      "title": "Reusable build template for ICP + React + shadcn/ui",
+      "synonyms": [
+        "build-template",
+        "build.sh",
+        "icp.yaml template",
+        "template deploy.sh"
+      ],
+      "description": "Adds a self-contained build-template scaffold (backend/frontend canister yamls, React+Vite+Tailwind+shadcn/ui setup, lint rules, image resize/prune scripts, and deployment scripts) to standardize builds and deployments for the project.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-39",
+      "title": "Profile Analytics small-screen responsiveness with horizontally scrollable heat map",
+      "synonyms": [
+        "AR-2",
+        "ProfileAnalytics responsive layout",
+        "scrollable heatmap grid"
+      ],
+      "description": "Updates the Profile Analytics layout for small screens so the Profile Area and Training Statistics metrics remain within the viewport while preserving heat map aspect ratio/cell sizing by making only the heat-map grid+labels horizontally scrollable on narrow viewports.",
+      "reqIds": [
+        "AR-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-animated-google-lens-style-multicolor-gradient-glow-highlight-blue-green-yellow-red-tones-that-works-in-both-light-and-dark-themes-and-expose-it-as-reusable-styling-tailwind-utilities-and-or-css-utility-classes-so-it-can-be-applied-consistently-to-the-specified-ui-elements-only",
+      "title": "Implement an animated, Google Lens-style multicolor gradient glow highlight (blue → green → yellow → red tones) that works in both light and dark themes, and expose it as reusable styling (Tailwind utilities and/or CSS utility classes) so it can be applied consistently to the specified UI elements only.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-remove-the-bug-debug-features-from-the-user-facing-ui-remove-the-debug-toggle-button-bug-icon-from-frontend-src-components-header-tsx-and-stop-rendering-the-debug-overlay-from-frontend-src-app-tsx-in-all-app-states-initializing-login-actor-connecting-profile-loading-profile-setup-loaded-fallback",
-      "title": "Remove the \"bug\"/debug features from the user-facing UI: remove the debug toggle button (Bug icon) from `frontend/src/components/Header.tsx` and stop rendering the debug overlay from `frontend/src/App.tsx` in all app states (initializing, login, actor-connecting, profile-loading, profile-setup, loaded, fallback).",
+      "id": "feature-update-the-header-branding-area-to-use-the-animated-google-lens-style-gradient-glow-styling-only-for-a-the-jiu-jitsu-journey-name-text-and-b-the-profile-button-desktop-profile-button-in-the-header-do-not-apply-the-new-glow-styling-to-other-header-controls-theme-toggle-logout-etc",
+      "title": "Update the header branding area to use the animated Google Lens-style gradient glow styling ONLY for: (a) the “Jiu-Jitsu Journey” name text, and (b) the Profile button (desktop profile button in the header). Do not apply the new glow styling to other header controls (theme toggle, logout, etc.).",
       "reqIds": [
         "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-dashboard-tab-navigation-so-that-only-the-selected-tab-buttons-profile-analytics-training-log-belt-tracker-techniques-use-the-animated-google-lens-style-multicolor-gradient-as-the-entire-button-background-in-both-light-and-dark-themes-non-selected-tabs-must-keep-their-current-styling-no-multicolor-gradient-background",
+      "title": "Update the dashboard tab navigation so that ONLY the selected tab buttons (Profile Analytics, Training Log, Belt Tracker, Techniques) use the animated Google Lens-style multicolor gradient as the entire button background, in both light and dark themes. Non-selected tabs must keep their current styling (no multicolor gradient background).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-welcome-login-page-to-apply-the-animated-google-lens-style-multicolor-gradient-glow-styling-only-to-a-the-bjj-icon-at-the-top-of-the-page-b-the-login-with-internet-identity-button-and-c-the-four-rounded-areas-on-the-welcome-page-the-rounded-info-panel-inside-the-welcome-card-and-the-three-rounded-feature-tiles-ensure-the-page-remains-readable-and-accessible-in-both-light-and-dark-themes",
+      "title": "Update the welcome/login page to apply the animated Google Lens-style multicolor gradient glow styling ONLY to: (a) the BJJ icon at the top of the page, (b) the “Login with Internet Identity” button, and (c) the four rounded areas on the welcome page (the rounded info panel inside the Welcome card and the three rounded feature tiles). Ensure the page remains readable and accessible in both light and dark themes.",
+      "reqIds": [
+        "REQ-4"
       ],
       "version": 1
     }
@@ -415,13 +510,7 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Move Training Heat Map into Profile Analytics → Training Statistics area, positioned under the 6 metrics, preserving current sizing and functionality.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Remove/disable buggy features elsewhere in the app (general cleanup per current build).",
+      "summary": "Add modern sleek multi-colored “Google Lens-style” gradient glow highlights to specific UI elements (header title/profile button, selected tabs, and welcome page icon/sign-in button/4 rounded areas)",
       "reqIds": [],
       "status": "pending"
     }
@@ -434,23 +523,23 @@
     "Actor creation is encapsulated in a dedicated hook (useActorWrapper) that tracks initialization steps and writes a small global init log buffer for diagnostics.",
     "Date handling is intentionally local-time based (sessions stored at local midnight; heatmaps/calendars map timestamps to local YYYY-MM-DD).",
     "Theming is local-first (next-themes + localStorage) with an optional asynchronous backend persistence call for authenticated users.",
-    "UX/perf helpers include drag-to-scroll for long panels and in-memory image preloading/caching to reduce flicker."
+    "UX/perf helpers include drag-to-scroll for long panels and in-memory image preloading/caching to reduce flicker.",
+    "A reusable build-template scaffold was added (ICP canister yamls + React/Vite/Tailwind/shadcn/ui + scripts) to standardize local builds and deployments.",
+    "Profile Analytics UI should be responsive on small screens; training heat map keeps its ratio but becomes horizontally scrollable on narrow viewports."
   ],
   "known_issues": [
-    "Backend RBAC can trap for new callers: AccessControl.getUserRole traps when a principal has no role entry; ensureUserRole calls getUserRole, so first-time users may trap unless access control is initialized/roles exist.",
     "_initializeAccessControlWithSecret traps if CAFFEINE_ADMIN_TOKEN is not set in the canister environment; deployments are sensitive to missing env configuration.",
     "Blob-storage cashier env var name is spelled CAFFFEINE_STORAGE_CASHIER_PRINCIPAL (three 'F's), increasing risk of misconfiguration and runtime traps.",
     "Backend state uses in-memory vars/Maps (no stable persistence shown), so user data may be lost across upgrades/redeploys unless stable storage is implemented elsewhere.",
     "Mood icon helper expects /assets/generated/{tough,hard,okay,good,great}.png, but repo assets shown are *.dim_512x512.png; may cause 404s unless non-dim .png variants are also deployed.",
     "Some React Query hooks swallow errors and return empty defaults ([], null), which can mask authorization/config issues unless console logs are inspected.",
-    "Legacy useActor hook unconditionally calls _initializeAccessControlWithSecret even when caffeineAdminToken is empty, which can break initialization if used instead of useActorWrapper.",
-    "Several files are empty placeholders (e.g., frontend/src/components/Profile.tsx, frontend/src/hooks/useActorReady.ts, frontend/src/components/Analytics.tsx, frontend/src/components/SubmissionTagInput.tsx, frontend/src/lib/submissionsListLoader.ts), indicating incomplete/unused planned functionality.",
     "There are two global Tailwind/CSS files (frontend/index.css and frontend/src/index.css); only src/index.css is imported, but duplication can cause confusion about the authoritative style source.",
-    "Local-midnight timestamp strategy can still produce edge-case date bucketing issues around DST transitions in some timezones."
+    "Local-midnight timestamp strategy can still produce edge-case date bucketing issues around DST transitions in some timezones.",
+    "Some content IDs load (e.g., 150xlr4, 19sngkx) while others (e.g., lf4nkz) fail and/or their images do not render; investigate ID-based routing/asset retrieval and image loading logic."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "gameProjectType": "none",
   "projectName": "Jiu-Jitsu Journey",
-  "clarification_mode": "instant",
+  "clarification_mode": "thinking",
   "clarification_rounds": 0
 }

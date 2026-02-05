@@ -1,41 +1,18 @@
 /**
- * Centralized mood icon helper that maps mood rating values to canonical generated asset paths
- * with lowercase .png filenames derived from mood labels.
+ * Centralized mood label and color mapping from 0-1 moodRating scale.
+ * Provides utilities to derive mood labels and exact hex colors without referencing image paths.
  */
 
 const MOOD_LABELS = ['Tough', 'Hard', 'Okay', 'Good', 'Great'];
 
-interface MoodIcon {
-  src: string;
-  alt: string;
-}
-
-/**
- * Get the mood icon for a given mood rating (0-1 scale)
- * Returns a safe fallback if the rating is invalid
- */
-export function getMoodIcon(rating: number): MoodIcon {
-  // Validate rating
-  if (typeof rating !== 'number' || isNaN(rating)) {
-    return { src: '/assets/generated/okay.png', alt: 'Okay' };
-  }
-
-  // Clamp rating to 0-1 range
-  const clampedRating = Math.max(0, Math.min(1, rating));
-  
-  // Map rating to mood label index
-  const index = Math.round(clampedRating * (MOOD_LABELS.length - 1));
-  const safeIndex = Math.max(0, Math.min(index, MOOD_LABELS.length - 1));
-  const label = MOOD_LABELS[safeIndex];
-  
-  // Convert label to lowercase filename
-  const filename = `${label.toLowerCase()}.png`;
-
-  return {
-    src: `/assets/generated/${filename}`,
-    alt: label,
-  };
-}
+// Exact hex colors for each mood label
+const MOOD_COLORS: Record<string, string> = {
+  'Tough': '#d51818',
+  'Hard': '#ff5f2f',
+  'Okay': '#f9a217',
+  'Good': '#f0dc04',
+  'Great': '#74d601',
+};
 
 /**
  * Get the mood label for a given mood rating (0-1 scale)
@@ -51,11 +28,23 @@ export function getMoodLabel(rating: number): string {
 }
 
 /**
- * Get all available mood icons
+ * Get the mood color (hex) for a given mood rating (0-1 scale)
  */
-export function getAllMoodIcons(): MoodIcon[] {
-  return MOOD_LABELS.map((label) => ({
-    src: `/assets/generated/${label.toLowerCase()}.png`,
-    alt: label,
-  }));
+export function getMoodColor(rating: number): string {
+  const label = getMoodLabel(rating);
+  return MOOD_COLORS[label] || MOOD_COLORS['Okay'];
+}
+
+/**
+ * Get all mood labels
+ */
+export function getAllMoodLabels(): string[] {
+  return [...MOOD_LABELS];
+}
+
+/**
+ * Get the mood color for a specific label
+ */
+export function getMoodColorByLabel(label: string): string {
+  return MOOD_COLORS[label] || MOOD_COLORS['Okay'];
 }
