@@ -1,40 +1,50 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T04:49:39.229Z",
+  "generatedAt": "2026-02-05T04:59:06.412Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
+        "summary": "Promote the currently deployed draft build (Draft Version 137) to the live (production) canister without introducing additional code or schema changes.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
-          "frontend/src/components/BeltTracker.tsx",
-          "frontend/src/components/CompletedBeltStageStatsCard.tsx"
+          "frontend/DRAFT_137_REDEPLOY_ASSERTION.md",
+          "frontend/REDEPLOY_NOTE_DRAFT_137.md"
         ],
         "matchedFiles": [
-          "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
-          "frontend/src/components/BeltTracker.tsx",
-          "frontend/src/components/CompletedBeltStageStatsCard.tsx"
+          "frontend/DRAFT_137_REDEPLOY_ASSERTION.md",
+          "frontend/REDEPLOY_NOTE_DRAFT_137.md"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Run a post-promotion smoke check on the live (production) deployment covering: initial app load, Internet Identity login/logout, actor initialization (no initialization trap), profile gating (profile setup vs dashboard), and verifying that submission proficiency tooltips render without errors.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/SMOKE_CHECK_DRAFT_137.md"
+        ],
+        "matchedFiles": [
+          "frontend/SMOKE_CHECK_DRAFT_137.md"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/BeltTracker.tsx",
-    "frontend/src/components/CompletedBeltStageStatsCard.tsx",
-    "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
+    "frontend/DRAFT_137_REDEPLOY_ASSERTION.md",
+    "frontend/REDEPLOY_NOTE_DRAFT_137.md",
+    "frontend/SMOKE_CHECK_DRAFT_137.md",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

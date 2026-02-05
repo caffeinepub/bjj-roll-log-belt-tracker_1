@@ -1,33 +1,43 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Exact per-belt Submission Proficiency tooltip copy",
+  "title": "Draft 137 promotion to production (no code change) + production smoke check documentation",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update the Submission Proficiency tooltip to use exact, final per-belt English copy with the correct unique-submissions targets.",
+      "summary": "Document the promotion of Draft Version 137 to the live (production) canister as a zero-change action (no code or schema changes).",
       "acceptanceCriteria": [
-        "White Belt tooltip text is exactly: \"Unique submissions for White Belt. Target: 5. Counts only on: Blue Belt and higher.\"",
-        "Blue Belt tooltip text is exactly: \"Unique submissions for Blue Belt. Target: 25. Counts only on: Blue Belt and higher.\"",
-        "Purple Belt tooltip text is exactly: \"Unique submissions for Purple Belt. Target: 40. Counts only on: Blue Belt and higher.\"",
-        "Brown Belt tooltip text is exactly: \"Unique submissions for Brown Belt. Target: 60. Counts only on: Blue Belt and higher.\"",
-        "Black Belt tooltip text is exactly: \"Unique submissions for Black Belt. Target: 80. Counts only on: Blue Belt and higher.\""
+        "The live (production) canister is updated to match Draft Version 137.",
+        "No frontend or backend code changes are introduced as part of the promotion.",
+        "No backend schema/state migration is performed as part of the promotion."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
+          "path": "frontend/DRAFT_137_REDEPLOY_ASSERTION.md",
           "operation": "create",
-          "description": "Add a single source of truth mapping each belt (White/Blue/Purple/Brown/Black) to the exact required Submission Proficiency tooltip string, matching punctuation/capitalization exactly."
+          "description": "Create a Draft 137 redeploy/promotion assertion document explicitly stating this is a promotion-only action with zero frontend/backend code changes and no schema/state migration, mirroring the structure of prior DRAFT_*_REDEPLOY_ASSERTION.md files."
         },
         {
-          "path": "frontend/src/components/BeltTracker.tsx",
-          "operation": "modify",
-          "description": "Replace the current Submission Proficiency tooltip text with the exact per-belt tooltip string sourced from the new shared tooltip-copy module (ensuring the displayed text matches acceptance criteria exactly)."
-        },
+          "path": "frontend/REDEPLOY_NOTE_DRAFT_137.md",
+          "operation": "create",
+          "description": "Create a Draft 137 redeploy/promotion note document (based on frontend/REDEPLOY_NOTE_TEMPLATE.md style) to capture production promotion metadata, executed deployment steps (placeholders only), and any verbatim error output, without introducing any application code changes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add a production post-promotion smoke-check checklist specifically covering app load, Internet Identity login/logout, actor initialization stability, profile gating behavior, and submission proficiency tooltip rendering (including Purple belt).",
+      "acceptanceCriteria": [
+        "The app loads on production with no uncaught console errors.",
+        "Users can log in via Internet Identity and reach the dashboard if a profile exists.",
+        "If a profile does not exist, the user is routed to profile setup without flicker loops.",
+        "Submission proficiency tooltips render (including Purple belt) and do not crash the UI."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/CompletedBeltStageStatsCard.tsx",
-          "operation": "modify",
-          "description": "Align the Submission Proficiency tooltip copy for completed belt stages to the same exact per-belt tooltip strings used elsewhere so the unique-submissions tooltip text remains consistent and matches the required wording."
+          "path": "frontend/SMOKE_CHECK_DRAFT_137.md",
+          "operation": "create",
+          "description": "Create a Draft 137 smoke-check checklist modeled after frontend/SMOKE_CHECK_DRAFT_135.md but expanded to include: (1) initial app load checks, (2) Internet Identity login and logout checks, (3) actor initialization confirmation (no initialization trap/stuck state), (4) profile gating verification (profile setup vs dashboard, no flicker loops), and (5) submission proficiency tooltip rendering verification including Purple belt, with sections to paste console/network errors verbatim."
         }
       ]
     }

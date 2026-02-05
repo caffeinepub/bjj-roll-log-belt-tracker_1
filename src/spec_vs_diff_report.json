@@ -1,16 +1,62 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T04:49:39.184Z",
-  "summary": "REQ-1 appears implemented: exact per-belt English tooltip strings (White/Blue/Purple/Brown/Black with targets 5/25/40/60/80 and the fixed suffix) were added in a centralized frontend lib file and imported for use in belt-tracker-related components. No evidence of edits under frontend/src/components/ui.",
-  "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.86,
+  "generatedAt": "2026-02-05T04:59:06.367Z",
+  "summary": "The BuildRequest is a promotion-only action (Draft 137 → production) with explicitly no code/schema changes and a post-promotion smoke check. The diff shows multiple repository changes, including a modification to `backend/main.mo` and added frontend markdown files. This conflicts with REQ-1’s “no frontend or backend code changes” constraint, and there is no evidence of an actual smoke check being executed (only checklists/docs were added).",
+  "missing_requirements": [
+    {
+      "id": "REQ-1",
+      "requirement": "Promote the currently deployed draft build (Draft Version 137) to the live (production) canister without introducing additional code or schema changes.",
+      "reason": "The diff includes a backend source modification, which violates the requirement that no frontend or backend code changes are introduced as part of the promotion. The diff also does not provide any deployment/promotion artifacts that demonstrate the production canister was updated to match Draft 137 (it only adds documentation placeholders).",
+      "evidence": [
+        "backend/main.mo (modified)",
+        "frontend/DRAFT_137_REDEPLOY_ASSERTION.md (added; includes placeholders “To be filled after deployment”)",
+        "frontend/REDEPLOY_NOTE_DRAFT_137.md (added; placeholders)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "Run a post-promotion smoke check on the live (production) deployment covering initial app load, Internet Identity login/logout, actor initialization, profile gating, and submission proficiency tooltips rendering without errors.",
+      "reason": "The diff adds smoke-check documentation/checklists but contains no evidence of the smoke check being performed (no recorded results, no automated test/run output, no filled checklist).",
+      "evidence": [
+        "frontend/SMOKE_CHECK_DRAFT_137.md (added; checklist/results sections empty)",
+        "frontend/DRAFT_137_REDEPLOY_ASSERTION.md (added; checklist unchecked)"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Backend code changes included in a promotion-only request (modification to Motoko backend).",
+      "reason": "The BuildRequest explicitly requires no backend code changes as part of the promotion; any backend edit is out of scope for a promotion-only action.",
+      "evidence": [
+        "backend/main.mo (modified)"
+      ]
+    },
+    {
+      "description": "Adding new frontend markdown documentation files under `frontend/` for redeploy assertions/notes/smoke checks.",
+      "reason": "The BuildRequest is promotion-only with “No frontend or backend code changes” and additionally constrains not to edit files under frontend read-only paths; adding frontend files is not requested by either REQ-1 or REQ-2 (REQ-2 asks to run a smoke check, not to add documentation templates).",
+      "evidence": [
+        "frontend/DRAFT_137_REDEPLOY_ASSERTION.md (added)",
+        "frontend/REDEPLOY_NOTE_DRAFT_137.md (added)",
+        "frontend/SMOKE_CHECK_DRAFT_137.md (added)"
+      ]
+    },
+    {
+      "description": "Updates to repository meta/snapshot files describing frontend behavior and project state.",
+      "reason": "Not requested in the promotion-only BuildRequest; these appear to be documentation/state summary changes rather than the requested deployment promotion itself.",
+      "evidence": [
+        "frontend-file-summaries.txt (modified)",
+        "project_state.json (modified)"
+      ]
+    }
+  ],
+  "confidence": 0.78,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/BeltTracker.tsx",
-    "frontend/src/components/CompletedBeltStageStatsCard.tsx",
-    "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
+    "frontend/DRAFT_137_REDEPLOY_ASSERTION.md",
+    "frontend/REDEPLOY_NOTE_DRAFT_137.md",
+    "frontend/SMOKE_CHECK_DRAFT_137.md",
     "project_state.json"
   ]
 }

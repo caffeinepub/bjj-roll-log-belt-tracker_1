@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 66,
-  "summary": "Jiu-Jitsu Journey scope expanded significantly beyond the initial BJJ log: iterative refactors focused on reliable ICP actor/auth/profile initialization (no hangs), improved profile editing UX, revamped Training Log into a month calendar + right-side details, enhanced analytics (6 metrics each for Profile Analytics + Training Log), multiple heat map iterations with year/month/day alignment fixes, expanded session fields (intensity, mood), redesigned Submission Log UI/behavior (per-opponent-belt logging, searchable dropdown, unique-per-belt enforcement, compact tags), gamified belt progression bars with per-belt reset rules, and broader UI polish (responsive layouts, gradient glow theme accents).",
+  "projectStateVersion": 72,
+  "summary": "Jiu-Jitsu Journey is an Internet Computer (ICP) dapp for Brazilian Jiu-Jitsu practitioners. Users authenticate with Internet Identity, create/edit a profile (belt/stripes, optional profile pic, gym info with favicon logo + location, practitioner-since month/year), log and edit training sessions (date, duration, gi/no-gi, session theme, intensity, rolls, mood), track belt progression with client-side gamified stats, maintain a multi-belt submission log (unique submissions per opponent belt with searchable dropdown + dedupe), build a personal technique library, and visualize activity via a month calendar and a GitHub-style yearly training heat map with year selector. The backend is a Motoko canister with RBAC and operational endpoints; reliability work focused on actor readiness, profile fallback flows, and avoiding init/upgrade traps that stop draft canisters.",
   "existing_features": [
     {
       "id": "IF-1",
@@ -475,72 +475,70 @@
       "version": 1
     },
     {
-      "id": "feature-provide-the-exact-final-english-tooltip-text-for-the-submission-proficiency-unique-submissions-tooltip-for-each-belt-white-blue-purple-brown-black-using-the-format-unique-submissions-for-current-belt-target-target-for-belt-counts-only-on-blue-belt-and-higher-and-using-the-app-s-existing-per-belt-numeric-targets-white-5-blue-25-purple-40-brown-60-black-80",
-      "title": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
+      "id": "IF-40",
+      "title": "Submission proficiency tooltip copy updated to belt-specific target and Blue+ counting rule",
+      "synonyms": [
+        "AR-3",
+        "submissionProficiencyTooltipCopy",
+        "Unique submissions tooltip"
+      ],
+      "description": "Updates the submission proficiency/stats tooltip text to: “Unique submissions for current belt. Target: target for belt. Counts only on: Blue Belt and higher.” and ensures the tooltip is shown with belt-specific values for each belt stage.",
+      "reqIds": [
+        "AR-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-promote-the-currently-deployed-draft-build-draft-version-137-to-the-live-production-canister-without-introducing-additional-code-or-schema-changes",
+      "title": "Promote the currently deployed draft build (Draft Version 137) to the live (production) canister without introducing additional code or schema changes.",
       "reqIds": [
         "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-run-a-post-promotion-smoke-check-on-the-live-production-deployment-covering-initial-app-load-internet-identity-login-logout-actor-initialization-no-initialization-trap-profile-gating-profile-setup-vs-dashboard-and-verifying-that-submission-proficiency-tooltips-render-without-errors",
+      "title": "Run a post-promotion smoke check on the live (production) deployment covering: initial app load, Internet Identity login/logout, actor initialization (no initialization trap), profile gating (profile setup vs dashboard), and verifying that submission proficiency tooltips render without errors.",
+      "reqIds": [
+        "REQ-2"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-1",
-      "summary": "Add modern sleek multi-colored “Google Lens-style” gradient glow highlights to specific UI elements (header title/profile button, selected tabs, and welcome page icon/sign-in button/4 rounded areas)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Optimize responsive layout: keep the two selected areas within the parent container and allow their content to wrap to new lines when it can’t fit (no overflow)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Update the submission stats tooltip copy to: “Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.” (shown for each belt)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
       "id": "AR-4",
-      "summary": "Stabilize startup flow: strict Internet Identity → identity → authenticated actor → profile fetch/create sequence with robust fallback (no infinite “Connecting/Loading profile”), plus optional debug overlay/logging to diagnose actor/profile states.",
+      "summary": "Stabilize auth/actor/profile initialization: strict post-login actor creation, robust try/catch fallback to Profile Setup on null/unauthorized, prevent setup/profile flicker loops, and add debug overlay/logs for actor/profile states.",
       "reqIds": [],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "AR-5",
-      "summary": "Revamp Training Log UI: replace long session list with a visually appealing month calendar (Gi/No-Gi styling, mood/intensity/roll indicators) and a right-hand month session details panel; support clicking a day to jump/scroll to details entry.",
+      "summary": "Training Log redesign: replace long recent-sessions list with a compact month-view calendar with Gi/No-Gi visual stamping, mood + rolls indicators, and a right-hand details panel; improve empty/zero states when no sessions exist.",
       "reqIds": [],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "AR-6",
-      "summary": "Training Heat Map in Profile Analytics: year-selectable GitHub-style heat map with Monday→Sunday rows, correct UTC/local mapping alignment, month label anchoring to month start column, selection reset on year change, responsive horizontal scroll for small screens, and theme-aware empty-cell colors.",
+      "summary": "Training Heat Map enhancements: year selector anchored over grid, Monday→Sunday rows, correct month label alignment, responsive horizontal scrolling on small screens, theme-aware empty-cell colors, selection/hover reset on year change, and click-to-view day details/deletion behavior (as needed).",
       "reqIds": [],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "AR-7",
-      "summary": "Enhance Log Training Session fields: add Intensity dropdown (Recovery/Flow, Light, Moderate default, Hard, Max/Comp), ensure Open Mat is supported end-to-end (frontend + backend SessionTheme), and ensure session saves include current belt/stripe snapshot.",
+      "summary": "Session logging upgrades: add intensity dropdown (Recovery/Flow, Light, Moderate, Hard, Max/Comp), add/maintain session themes list (incl Open Mat) synced with backend, and ensure mood slider/labels behavior matches desired UI.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-8",
-      "summary": "Redesign Submission Log: standalone section below Recent Sessions with belt-aligned searchable dropdowns, per-opponent-belt selection, unique-per-belt enforcement (case-insensitive), compact tags (max 5 with expand), auto-save when already saved, and ability to filter/view by opponent belt.",
+      "summary": "Submission Log revamp: dedicated section below sessions, belt-aligned searchable dropdowns, per-belt uniqueness (case-insensitive), belt selector for opponent belt when logging, compact tag display (max 5 + expand), hard-coded alphabetical submissions list option, and auto-save behavior.",
       "reqIds": [],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "id": "AR-9",
-      "summary": "Gamified Belt Progression Stats: add bars for Progression/Experience/Submission Proficiency/Technique Mastery with tooltips; per-belt resets (including white belt target); ensure next belt visuals and badges match desired locked/faded rules; keep update belt/stripes controls on one row on all screen sizes.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Profile/Technique UX polish: ensure profile picture + gym favicon/logo persist and cache like belts; Profile Setup includes cancel while editing; improve Practitioner Since year selector usability; Add Technique type dropdown uses hardcoded submission list with 5-item visible limit + scroll.",
+      "summary": "Technique Library updates: technique category/theme options, technique type as dropdown/creatable select with persistence, limit long dropdowns (5 visible + scroll), and link-based thumbnail creation.",
       "reqIds": [],
       "status": "pending"
     }
@@ -561,15 +559,14 @@
     "_initializeAccessControlWithSecret traps if CAFFEINE_ADMIN_TOKEN is not set in the canister environment; deployments are sensitive to missing env configuration.",
     "Blob-storage cashier env var name is spelled CAFFFEINE_STORAGE_CASHIER_PRINCIPAL (three 'F's), increasing risk of misconfiguration and runtime traps.",
     "Backend state uses in-memory vars/Maps (no stable persistence shown), so user data may be lost across upgrades/redeploys unless stable storage is implemented elsewhere.",
-    "Mood icon helper expects /assets/generated/{tough,hard,okay,good,great}.png, but repo assets shown are *.dim_512x512.png; may cause 404s unless non-dim .png variants are also deployed.",
     "Some React Query hooks swallow errors and return empty defaults ([], null), which can mask authorization/config issues unless console logs are inspected.",
     "There are two global Tailwind/CSS files (frontend/index.css and frontend/src/index.css); only src/index.css is imported, but duplication can cause confusion about the authoritative style source.",
     "Local-midnight timestamp strategy can still produce edge-case date bucketing issues around DST transitions in some timezones.",
     "Some content IDs load (e.g., 150xlr4, 19sngkx) while others (e.g., lf4nkz) fail and/or their images do not render; investigate ID-based routing/asset retrieval and image loading logic.",
-    "Draft deployments frequently hit IC0508 Reject code 5 “Canister is stopped” (cycles/stop/half-upgrade); requires redeploy/new draft; should minimize init/postupgrade traps and reduce reliance on manual init endpoints.",
-    "Mood PNGs often fail to render due to asset-path/filename case mismatches and differing expected directories (/assets/generated vs /assets/moods); belts load because their paths match exactly."
+    "Draft/backend canisters frequently end up stopped (Reject code 5 / IC0508), requiring redeploy/new draft; may be due to cycles depletion or init/upgrade traps.",
+    "Mood icon assets are sensitive to path + exact filename casing; mismatches (e.g., expected /assets/generated/{tough,hard,okay,good,great}.png vs existing dim_* filenames or different folder) can cause broken images."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "gameProjectType": "none",
   "projectName": "Jiu-Jitsu Journey",
   "clarification_mode": "thinking",

@@ -1,13 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Define and apply the exact final English tooltip copy for the “Submission Proficiency / unique-submissions” tooltip for each belt with correct per-belt targets.
+**Goal:** Promote the currently deployed draft build (Draft Version 137) to the live (production) canister without introducing any code or schema changes, then verify production stability via a smoke check.
 
 **Planned changes:**
-- Set the White Belt tooltip text to: "Unique submissions for White Belt. Target: 5. Counts only on: Blue Belt and higher."
-- Set the Blue Belt tooltip text to: "Unique submissions for Blue Belt. Target: 25. Counts only on: Blue Belt and higher."
-- Set the Purple Belt tooltip text to: "Unique submissions for Purple Belt. Target: 40. Counts only on: Blue Belt and higher."
-- Set the Brown Belt tooltip text to: "Unique submissions for Brown Belt. Target: 60. Counts only on: Blue Belt and higher."
-- Set the Black Belt tooltip text to: "Unique submissions for Black Belt. Target: 80. Counts only on: Blue Belt and higher."
+- Promote Draft Version 137 to the live (production) canister.
+- Run a post-promotion smoke check on production: initial app load, Internet Identity login/logout, actor initialization (no trap), profile gating (setup vs dashboard), and submission proficiency tooltips rendering (including Purple belt).
 
-**User-visible outcome:** Users see consistent, finalized tooltip text for unique submissions across all belts, with the correct target number displayed per belt.
+**User-visible outcome:** The production app matches Draft Version 137, and users can load the app, authenticate, be routed correctly based on profile existence, and view submission proficiency tooltips without crashes or console errors.

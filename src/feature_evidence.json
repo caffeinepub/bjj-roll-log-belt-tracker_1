@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-provide-the-exact-final-english-tooltip-text-for-the-submission-proficiency-unique-submissions-tooltip-for-each-belt-white-blue-purple-brown-black-using-the-format-unique-submissions-for-current-belt-target-target-for-belt-counts-only-on-blue-belt-and-higher-and-using-the-app-s-existing-per-belt-numeric-targets-white-5-blue-25-purple-40-brown-60-black-80",
-      "featureTitle": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
+      "featureId": "feature-promote-the-currently-deployed-draft-build-draft-version-137-to-the-live-production-canister-without-introducing-additional-code-or-schema-changes",
+      "featureTitle": "Promote the currently deployed draft build (Draft Version 137) to the live (production) canister without introducing additional code or schema changes.",
       "files": [
-        "frontend/src/components/BeltTracker.tsx",
-        "frontend/src/components/CompletedBeltStageStatsCard.tsx",
-        "frontend/src/lib/submissionProficiencyTooltipCopy.ts"
+        "frontend/DRAFT_137_REDEPLOY_ASSERTION.md",
+        "frontend/REDEPLOY_NOTE_DRAFT_137.md"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,6 +19,26 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-run-a-post-promotion-smoke-check-on-the-live-production-deployment-covering-initial-app-load-internet-identity-login-logout-actor-initialization-no-initialization-trap-profile-gating-profile-setup-vs-dashboard-and-verifying-that-submission-proficiency-tooltips-render-without-errors",
+      "featureTitle": "Run a post-promotion smoke check on the live (production) deployment covering: initial app load, Internet Identity login/logout, actor initialization (no initialization trap), profile gating (profile setup vs dashboard), and verifying that submission proficiency tooltips render without errors.",
+      "files": [
+        "frontend/SMOKE_CHECK_DRAFT_137.md"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "blob-storage@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

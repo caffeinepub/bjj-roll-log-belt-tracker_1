@@ -1007,7 +1007,7 @@ actor {
     };
   };
 
-  // New Belt Stage History Methods
+  // Belt Stage History Methods
 
   public shared ({ caller }) func startNewBeltStage(
     beltLevel : BeltLevel,
@@ -1019,6 +1019,7 @@ actor {
     },
     initialSubmissions : [SubmissionCount],
   ) : async () {
+    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can start a new belt stage");
     };
@@ -1049,6 +1050,7 @@ actor {
     },
     finalSubmissions : [SubmissionCount],
   ) : async () {
+    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can end a belt stage");
     };
@@ -1102,6 +1104,7 @@ actor {
     },
     updatedSubmissions : [SubmissionCount],
   ) : async () {
+    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can update a belt stage");
     };

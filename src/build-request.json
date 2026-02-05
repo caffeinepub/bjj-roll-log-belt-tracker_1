@@ -1,36 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Define exact per-belt submission tooltip copy (with correct targets)",
-  "priority": "normal",
+  "title": "Promote current draft build to live (production) canister",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
-      "target": "frontend",
+      "text": "Promote the currently deployed draft build (Draft Version 137) to the live (production) canister without introducing additional code or schema changes.",
+      "target": "unknown",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-7"
         ],
         "quotes": [
-          "1. list the exact tooltip text for each belt so know they are right."
+          "1. yes"
         ]
       },
       "acceptanceCriteria": [
-        "White Belt tooltip text is exactly: \"Unique submissions for White Belt. Target: 5. Counts only on: Blue Belt and higher.\"",
-        "Blue Belt tooltip text is exactly: \"Unique submissions for Blue Belt. Target: 25. Counts only on: Blue Belt and higher.\"",
-        "Purple Belt tooltip text is exactly: \"Unique submissions for Purple Belt. Target: 40. Counts only on: Blue Belt and higher.\"",
-        "Brown Belt tooltip text is exactly: \"Unique submissions for Brown Belt. Target: 60. Counts only on: Blue Belt and higher.\"",
-        "Black Belt tooltip text is exactly: \"Unique submissions for Black Belt. Target: 80. Counts only on: Blue Belt and higher.\""
+        "The live (production) canister is updated to match Draft Version 137.",
+        "No frontend or backend code changes are introduced as part of the promotion.",
+        "No backend schema/state migration is performed as part of the promotion."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Run a post-promotion smoke check on the live (production) deployment covering: initial app load, Internet Identity login/logout, actor initialization (no initialization trap), profile gating (profile setup vs dashboard), and verifying that submission proficiency tooltips render without errors.",
+      "target": "unknown",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "1. yes"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The app loads on production with no uncaught console errors.",
+        "Users can log in via Internet Identity and reach the dashboard if a profile exists.",
+        "If a profile does not exist, the user is routed to profile setup without flicker loops.",
+        "Submission proficiency tooltips render (including Purple belt) and do not crash the UI."
       ]
     }
   ],
   "constraints": [
-    "Use English for all user-facing text.",
-    "Do not edit files under frontend/src/components/ui (compose them instead)."
+    "Do not edit files under frontend.immutablePaths (read-only components/hooks).",
+    "Respect the single-actor backend architecture (all Motoko logic remains in backend/main.mo).",
+    "Do not add new features or UI changes; this request is a promotion-only action."
   ],
   "nonGoals": [
-    "No changes to backend models or APIs.",
-    "No UI redesign beyond updating/confirming the exact tooltip copy."
+    "Changing tooltip copy or tooltip styling.",
+    "Refactoring auth/actor/profile initialization logic.",
+    "Any new backend endpoints, data model changes, or migrations.",
+    "Any new images or asset generation."
   ],
   "imageRequirements": {
     "required": [],
