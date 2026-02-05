@@ -48,6 +48,25 @@ export const Technique = IDL.Record({
 });
 export const Time = IDL.Int;
 export const TrainingType = IDL.Variant({ 'gi' : IDL.Null, 'noGi' : IDL.Null });
+export const BeltLevel = IDL.Variant({
+  'blue' : IDL.Null,
+  'purple' : IDL.Null,
+  'black' : IDL.Null,
+  'brown' : IDL.Null,
+  'white' : IDL.Null,
+});
+export const BeltProgress = IDL.Record({
+  'belt' : BeltLevel,
+  'imageUrl' : IDL.Text,
+  'stripes' : IDL.Nat,
+});
+export const Intensity = IDL.Variant({
+  'recoveryFlow' : IDL.Null,
+  'hard' : IDL.Null,
+  'light' : IDL.Null,
+  'maxComp' : IDL.Null,
+  'moderate' : IDL.Null,
+});
 export const TrainingSession = IDL.Record({
   'id' : IDL.Text,
   'duration' : IDL.Nat,
@@ -55,7 +74,9 @@ export const TrainingSession = IDL.Record({
   'moodRating' : IDL.Float64,
   'sessionTheme' : SessionTheme,
   'trainingType' : TrainingType,
+  'beltSnapshot' : BeltProgress,
   'rolls' : IDL.Nat,
+  'intensity' : Intensity,
 });
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
@@ -70,18 +91,6 @@ export const GymInfo = IDL.Record({
   'name' : IDL.Text,
   'logoUrl' : IDL.Opt(IDL.Text),
   'location' : IDL.Text,
-});
-export const BeltLevel = IDL.Variant({
-  'blue' : IDL.Null,
-  'purple' : IDL.Null,
-  'black' : IDL.Null,
-  'brown' : IDL.Null,
-  'white' : IDL.Null,
-});
-export const BeltProgress = IDL.Record({
-  'belt' : BeltLevel,
-  'imageUrl' : IDL.Text,
-  'stripes' : IDL.Nat,
 });
 export const StreakAchievement = IDL.Record({
   'id' : IDL.Text,
@@ -135,6 +144,7 @@ export const SubmissionCount = IDL.Record({
 });
 export const SubmissionLog = IDL.Record({
   'blackBelt' : IDL.Vec(SubmissionCount),
+  'whiteBelt' : IDL.Vec(SubmissionCount),
   'brownBelt' : IDL.Vec(SubmissionCount),
   'blueBelt' : IDL.Vec(SubmissionCount),
   'purpleBelt' : IDL.Vec(SubmissionCount),
@@ -152,6 +162,7 @@ export const Belt = IDL.Variant({
   'purple' : IDL.Null,
   'black' : IDL.Null,
   'brown' : IDL.Null,
+  'white' : IDL.Null,
 });
 export const ExtendedProfile = IDL.Record({
   'bio' : IDL.Text,
@@ -334,6 +345,25 @@ export const idlFactory = ({ IDL }) => {
   });
   const Time = IDL.Int;
   const TrainingType = IDL.Variant({ 'gi' : IDL.Null, 'noGi' : IDL.Null });
+  const BeltLevel = IDL.Variant({
+    'blue' : IDL.Null,
+    'purple' : IDL.Null,
+    'black' : IDL.Null,
+    'brown' : IDL.Null,
+    'white' : IDL.Null,
+  });
+  const BeltProgress = IDL.Record({
+    'belt' : BeltLevel,
+    'imageUrl' : IDL.Text,
+    'stripes' : IDL.Nat,
+  });
+  const Intensity = IDL.Variant({
+    'recoveryFlow' : IDL.Null,
+    'hard' : IDL.Null,
+    'light' : IDL.Null,
+    'maxComp' : IDL.Null,
+    'moderate' : IDL.Null,
+  });
   const TrainingSession = IDL.Record({
     'id' : IDL.Text,
     'duration' : IDL.Nat,
@@ -341,7 +371,9 @@ export const idlFactory = ({ IDL }) => {
     'moodRating' : IDL.Float64,
     'sessionTheme' : SessionTheme,
     'trainingType' : TrainingType,
+    'beltSnapshot' : BeltProgress,
     'rolls' : IDL.Nat,
+    'intensity' : Intensity,
   });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
@@ -356,18 +388,6 @@ export const idlFactory = ({ IDL }) => {
     'name' : IDL.Text,
     'logoUrl' : IDL.Opt(IDL.Text),
     'location' : IDL.Text,
-  });
-  const BeltLevel = IDL.Variant({
-    'blue' : IDL.Null,
-    'purple' : IDL.Null,
-    'black' : IDL.Null,
-    'brown' : IDL.Null,
-    'white' : IDL.Null,
-  });
-  const BeltProgress = IDL.Record({
-    'belt' : BeltLevel,
-    'imageUrl' : IDL.Text,
-    'stripes' : IDL.Nat,
   });
   const StreakAchievement = IDL.Record({
     'id' : IDL.Text,
@@ -418,6 +438,7 @@ export const idlFactory = ({ IDL }) => {
   const SubmissionCount = IDL.Record({ 'name' : IDL.Text, 'count' : IDL.Nat });
   const SubmissionLog = IDL.Record({
     'blackBelt' : IDL.Vec(SubmissionCount),
+    'whiteBelt' : IDL.Vec(SubmissionCount),
     'brownBelt' : IDL.Vec(SubmissionCount),
     'blueBelt' : IDL.Vec(SubmissionCount),
     'purpleBelt' : IDL.Vec(SubmissionCount),
@@ -435,6 +456,7 @@ export const idlFactory = ({ IDL }) => {
     'purple' : IDL.Null,
     'black' : IDL.Null,
     'brown' : IDL.Null,
+    'white' : IDL.Null,
   });
   const ExtendedProfile = IDL.Record({
     'bio' : IDL.Text,

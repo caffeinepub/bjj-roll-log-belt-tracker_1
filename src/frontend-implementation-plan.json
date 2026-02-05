@@ -1,22 +1,60 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Submission Log add-submission dropdowns: integrated search with live filtering",
+  "title": "Expand Profile Analytics and Training Log analytics from 4 to 6 metrics/visualizations",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Refine the four Submission Log belt add-submission combobox controls to use a cleaner dropdown with an integrated search field and real-time option filtering, implemented only in SubmissionSelectInput.tsx.",
+      "summary": "Expand Profile Analytics “Training Statistics” to exactly 6 metrics derived from existing training sessions and submission log data (including theme + intensity summaries).",
       "acceptanceCriteria": [
-        "Each belt’s add-submission control opens a dropdown that shows the complete options list by default and filters the list in real time as the user types.",
-        "The search input is presented as part of the dropdown experience in a clean, compact way (no visually awkward separation between the trigger and the search field).",
-        "The dropdown remains keyboard-accessible (type to filter, arrow keys to navigate, enter to select) and closes upon selection.",
-        "No other Submission Log elements outside the four selected add-submission controls are modified."
+        "Profile Analytics \"Training Statistics\" renders exactly 6 metric tiles/cards corresponding to the requested list.",
+        "Total Rolls equals the sum of TrainingSession.rolls across all loaded sessions.",
+        "Submissions Learned counts unique submission names across blueBelt, purpleBelt, brownBelt, and blackBelt submission log arrays (case-insensitive uniqueness).",
+        "Favorite Theme shows the most frequent theme label derived from TrainingSession.sessionTheme via the existing formatter.",
+        "Average Intensity is computed from all sessions with a consistent ordinal mapping of the existing Intensity enum and displays a sensible label (and a safe fallback when there are no sessions).",
+        "When there are 0 sessions, all six metrics display safe defaults (e.g., 0 / N/A) without throwing."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/SubmissionSelectInput.tsx",
+          "path": "frontend/src/lib/intensityUtils.ts",
           "operation": "modify",
-          "description": "Update the existing Popover+Command-based combobox UI to a cleaner dropdown pattern with an integrated search field at the top of the dropdown surface and live filtering of the full submission list (excluding already-selected submissions). Ensure keyboard accessibility (typing filters, arrow navigation, enter selects), autofocus/interaction polish, and close-on-select behavior—without changing any other Submission Log UI or any files under frontend/src/components/ui."
+          "description": "Add a consistent Intensity <-> numeric ordinal mapping helper (and nearest-label helper) so both Profile Analytics and Training Log analytics can compute and label average intensity deterministically."
+        },
+        {
+          "path": "frontend/src/lib/trainingAnalytics.ts",
+          "operation": "create",
+          "description": "Create shared analytics helpers for session aggregation (e.g., safe duration-to-hours conversion, favorite theme counting using the existing theme formatter, and intensity averaging using the shared intensity mapping) to keep ProfileAnalytics.tsx logic concise and consistent."
+        },
+        {
+          "path": "frontend/src/components/ProfileAnalytics.tsx",
+          "operation": "modify",
+          "description": "Update the “Training Statistics” card grid to render exactly 6 metric tiles: Total Sessions, Total Training Time (hours derived from duration), Total Rolls (sum of rolls), Submissions Learned (unique submissions across blue/purple/brown/black from submission log via useGetSubmissionLog + normalizeSubmissionName), Favorite Theme (mode of sessionTheme formatted with formatSessionTheme), and Average Intensity (average via shared mapping shown as label with safe fallback like N/A). Ensure safe defaults for 0 sessions and keep all user-facing text in English."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Expand Training Log “Training Analytics” to 6 chart visualizations (gi/no-gi ratio, theme distribution, rolls trend, intensity trend, mood vs intensity scatter, and weekly/monthly volume with toggles) derived from existing sessions only.",
+      "acceptanceCriteria": [
+        "Training Log renders 6 analytics visualizations matching the requested list, and all charts render without runtime errors.",
+        "Gi vs No-Gi ratio uses TrainingSession.trainingType and displays correct proportions for the loaded sessions.",
+        "Session Theme Frequency chart uses TrainingSession.sessionTheme formatted to human-readable labels.",
+        "Average Rolls per Session trend derives from TrainingSession.rolls and is grouped into consistent time buckets (e.g., by week or month) with deterministic ordering.",
+        "Intensity trend converts the Intensity enum to a numeric scale consistently and charts the aggregated intensity over time.",
+        "Mood vs Intensity correlation chart plots one point per session (or per bucket, if explicitly chosen) using moodRating and intensity numeric values.",
+        "Weekly/Monthly volume chart supports both week and month aggregation and supports showing either hours (duration-derived) or sessions (count).",
+        "If sessions.length === 0, each visualization area shows a clear empty-state message (in English) rather than an empty/broken chart."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/trainingAnalytics.ts",
+          "operation": "modify",
+          "description": "Extend shared analytics helpers to support deterministic time-bucketing (weekly and monthly), computing per-bucket averages (rolls, intensity) and totals (hours, sessions), and generating chart-friendly datasets for Recharts while handling empty inputs safely."
+        },
+        {
+          "path": "frontend/src/components/TrainingLog.tsx",
+          "operation": "modify",
+          "description": "Replace/upgrade the Training Analytics section to include exactly 6 Recharts-based visualizations: (1) Gi vs No-Gi Ratio pie (trainingType), (2) Session Theme Frequency pie (sessionTheme formatted with formatSessionTheme), (3) Average Rolls per Session trend over time (line chart with deterministic time buckets), (4) Intensity Trends Over Time (line chart using shared intensity numeric mapping and aggregation), (5) Mood vs Intensity Correlation (scatter plot: moodRating vs intensity numeric), (6) Weekly/Monthly Training Volume (bar chart) with a simple in-UI toggle supporting both Weekly vs Monthly and Hours vs Sessions without any new backend calls. Ensure each visualization shows an English empty-state message when sessions.length === 0."
         }
       ]
     }

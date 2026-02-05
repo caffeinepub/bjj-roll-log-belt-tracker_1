@@ -1,33 +1,4 @@
-import { BeltLevel } from '../backend';
-
-// Preload belt images for better caching
-const BELT_IMAGES = new Map<string, HTMLImageElement>();
-
-export function preloadBeltImage(belt: BeltLevel, stripes: number): void {
-  const url = getBeltImageUrl(belt, stripes);
-  
-  if (!BELT_IMAGES.has(url)) {
-    const img = new Image();
-    img.src = url;
-    BELT_IMAGES.set(url, img);
-  }
-}
-
-export function preloadAllBeltImages(): void {
-  const belts: BeltLevel[] = [
-    BeltLevel.white,
-    BeltLevel.blue,
-    BeltLevel.purple,
-    BeltLevel.brown,
-    BeltLevel.black,
-  ];
-
-  belts.forEach((belt) => {
-    for (let stripes = 0; stripes <= 4; stripes++) {
-      preloadBeltImage(belt, stripes);
-    }
-  });
-}
+type BeltLevel = 'white' | 'blue' | 'purple' | 'brown' | 'black';
 
 export function getBeltImageUrl(belt: BeltLevel, stripes: number): string {
   const beltName = belt.charAt(0).toUpperCase() + belt.slice(1);
@@ -39,4 +10,34 @@ export function getBeltImageUrl(belt: BeltLevel, stripes: number): string {
 
 export function getBeltName(belt: BeltLevel): string {
   return belt.charAt(0).toUpperCase() + belt.slice(1) + ' Belt';
+}
+
+// Preload a single belt image
+export function preloadBeltImage(belt: BeltLevel, stripes: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error(`Failed to load belt image: ${belt}-${stripes}`));
+    img.src = getBeltImageUrl(belt, stripes);
+  });
+}
+
+// Preload all belt images for better caching
+export async function preloadAllBeltImages(): Promise<void> {
+  const belts: BeltLevel[] = ['white', 'blue', 'purple', 'brown', 'black'];
+  const stripes = [0, 1, 2, 3, 4];
+  
+  const promises: Promise<void>[] = [];
+  
+  for (const belt of belts) {
+    for (const stripe of stripes) {
+      promises.push(preloadBeltImage(belt, stripe));
+    }
+  }
+  
+  try {
+    await Promise.all(promises);
+  } catch (error) {
+    console.warn('Some belt images failed to preload:', error);
+  }
 }

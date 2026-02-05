@@ -13,7 +13,8 @@ import type { Principal } from '@icp-sdk/core/principal';
 export type Belt = { 'blue' : null } |
   { 'purple' : null } |
   { 'black' : null } |
-  { 'brown' : null };
+  { 'brown' : null } |
+  { 'white' : null };
 export type BeltLevel = { 'blue' : null } |
   { 'purple' : null } |
   { 'black' : null } |
@@ -51,6 +52,11 @@ export interface GymInfo {
   'logoUrl' : [] | [string],
   'location' : string,
 }
+export type Intensity = { 'recoveryFlow' : null } |
+  { 'hard' : null } |
+  { 'light' : null } |
+  { 'maxComp' : null } |
+  { 'moderate' : null };
 export type SessionTheme = { 'openMat' : null } |
   { 'takedowns_standup' : null } |
   { 'turtleGame' : null } |
@@ -75,6 +81,7 @@ export interface StreakAchievement {
 export interface SubmissionCount { 'name' : string, 'count' : bigint }
 export interface SubmissionLog {
   'blackBelt' : Array<SubmissionCount>,
+  'whiteBelt' : Array<SubmissionCount>,
   'brownBelt' : Array<SubmissionCount>,
   'blueBelt' : Array<SubmissionCount>,
   'purpleBelt' : Array<SubmissionCount>,
@@ -123,7 +130,9 @@ export interface TrainingSession {
   'moodRating' : number,
   'sessionTheme' : SessionTheme,
   'trainingType' : TrainingType,
+  'beltSnapshot' : BeltProgress,
   'rolls' : bigint,
+  'intensity' : Intensity,
 }
 export type TrainingType = { 'gi' : null } |
   { 'noGi' : null };

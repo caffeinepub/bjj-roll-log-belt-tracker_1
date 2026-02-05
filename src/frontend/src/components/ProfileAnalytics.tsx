@@ -1,21 +1,24 @@
 import { useEffect } from 'react';
-import { useGetCallerUserProfile, useGetTrainingRecords } from '../hooks/useQueries';
+import { useGetCallerUserProfile, useGetTrainingRecords, useGetSubmissionLog } from '../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Calendar, Clock, Award, TrendingUp, MapPin, Building2 } from 'lucide-react';
+import { User, Calendar, Clock, Award, TrendingUp, MapPin, Building2, Target, Zap } from 'lucide-react';
 import { getBeltName, preloadAllBeltImages } from '../lib/beltUtils';
 import { format, differenceInDays } from 'date-fns';
 import TrainingHeatMap from './TrainingHeatMap';
+import CachedImage from './CachedImage';
+import { calculateFavoriteTheme, calculateAverageIntensity, countUniqueSubmissions, durationToHours } from '../lib/trainingAnalytics';
 
 export default function ProfileAnalytics() {
   const { data: userProfile, isLoading: profileLoading } = useGetCallerUserProfile();
   const { data: sessions = [], isLoading: sessionsLoading } = useGetTrainingRecords();
+  const { data: submissionLog, isLoading: submissionLogLoading } = useGetSubmissionLog();
 
   // Preload all belt images on component mount for better caching
   useEffect(() => {
     preloadAllBeltImages();
   }, []);
 
-  if (profileLoading || sessionsLoading || !userProfile) {
+  if (profileLoading || sessionsLoading || submissionLogLoading || !userProfile) {
     return (
       <div className="flex items-center justify-center py-12">
         <p className="text-muted-foreground">Loading profile and analytics...</p>
@@ -26,6 +29,16 @@ export default function ProfileAnalytics() {
   const totalSessions = sessions.length;
   const totalMinutes = sessions.reduce((sum, s) => sum + Number(s.duration), 0);
   const totalHours = Math.round(totalMinutes / 60);
+  const totalRolls = sessions.reduce((sum, s) => sum + Number(s.rolls), 0);
+
+  // Calculate submissions learned (unique submissions at blue belt and above)
+  const submissionsLearned = submissionLog ? countUniqueSubmissions(submissionLog) : 0;
+
+  // Calculate favorite theme
+  const favoriteTheme = calculateFavoriteTheme(sessions);
+
+  // Calculate average intensity
+  const averageIntensity = calculateAverageIntensity(sessions);
 
   // Calculate training streak
   const sortedSessions = [...sessions].sort((a, b) => Number(b.date - a.date));
@@ -72,19 +85,16 @@ export default function ProfileAnalytics() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col items-center text-center space-y-4">
-              {userProfile.profilePicture ? (
-                <img
-                  src={userProfile.profilePicture.getDirectURL()}
-                  alt={userProfile.username}
-                  className="h-24 w-24 rounded-full object-cover border-4 border-gradient-to-br from-bjj-blue to-bjj-purple"
-                />
-              ) : (
-                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-bjj-blue to-bjj-purple flex items-center justify-center">
-                  <span className="text-4xl font-bold text-white">
-                    {userProfile.username.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+              <CachedImage
+                src={
+                  userProfile.profilePicture
+                    ? userProfile.profilePicture.getDirectURL()
+                    : '/assets/generated/profile-avatar-placeholder.dim_256x256.png'
+                }
+                alt={userProfile.username}
+                fallback="/assets/generated/profile-avatar-placeholder.dim_256x256.png"
+                className="h-24 w-24 rounded-full object-cover border-4 border-gradient-to-br from-bjj-blue to-bjj-purple"
+              />
               <div>
                 <h3 className="text-2xl font-bold">{userProfile.username}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -94,7 +104,7 @@ export default function ProfileAnalytics() {
             </div>
 
             <div className="rounded-lg bg-muted/50 p-4">
-              <img
+              <CachedImage
                 src={userProfile.beltProgress.imageUrl}
                 alt="Current belt"
                 className="h-12 w-full object-contain"
@@ -112,7 +122,7 @@ export default function ProfileAnalytics() {
               <div className="space-y-3 pt-2 border-t">
                 <div className="flex items-start gap-3">
                   {userProfile.gym.logoUrl && (
-                    <img
+                    <CachedImage
                       src={userProfile.gym.logoUrl}
                       alt="Gym logo"
                       className="h-10 w-10 object-contain rounded"
@@ -157,7 +167,7 @@ export default function ProfileAnalytics() {
             <CardDescription>Your training journey at a glance</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="rounded-lg border-2 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="h-4 w-4" />
@@ -170,7 +180,7 @@ export default function ProfileAnalytics() {
               <div className="rounded-lg border-2 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Clock className="h-4 w-4" />
-                  <span className="text-sm font-medium">Training Time</span>
+                  <span className="text-sm font-medium">Total Training Time</span>
                 </div>
                 <p className="text-3xl font-bold">{totalHours}h</p>
                 <p className="text-xs text-muted-foreground">{totalMinutes} minutes total</p>
@@ -178,24 +188,38 @@ export default function ProfileAnalytics() {
 
               <div className="rounded-lg border-2 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Award className="h-4 w-4" />
-                  <span className="text-sm font-medium">Current Streak</span>
+                  <Target className="h-4 w-4" />
+                  <span className="text-sm font-medium">Total Rolls</span>
                 </div>
-                <p className="text-3xl font-bold">{currentStreak}</p>
-                <p className="text-xs text-muted-foreground">
-                  {currentStreak === 1 ? 'week' : 'weeks'} of consistent training
-                </p>
+                <p className="text-3xl font-bold">{totalRolls}</p>
+                <p className="text-xs text-muted-foreground">Sparring rounds completed</p>
+              </div>
+
+              <div className="rounded-lg border-2 p-4 space-y-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Award className="h-4 w-4" />
+                  <span className="text-sm font-medium">Submissions Learned</span>
+                </div>
+                <p className="text-3xl font-bold">{submissionsLearned}</p>
+                <p className="text-xs text-muted-foreground">Unique submissions (blue+)</p>
               </div>
 
               <div className="rounded-lg border-2 p-4 space-y-2">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <TrendingUp className="h-4 w-4" />
-                  <span className="text-sm font-medium">Avg. Session</span>
+                  <span className="text-sm font-medium">Favorite Theme</span>
                 </div>
-                <p className="text-3xl font-bold">
-                  {totalSessions > 0 ? Math.round(totalMinutes / totalSessions) : 0}m
-                </p>
-                <p className="text-xs text-muted-foreground">Average session duration</p>
+                <p className="text-2xl font-bold truncate">{favoriteTheme}</p>
+                <p className="text-xs text-muted-foreground">Most practiced theme</p>
+              </div>
+
+              <div className="rounded-lg border-2 p-4 space-y-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Zap className="h-4 w-4" />
+                  <span className="text-sm font-medium">Average Intensity</span>
+                </div>
+                <p className="text-2xl font-bold truncate">{averageIntensity}</p>
+                <p className="text-xs text-muted-foreground">Overall session intensity</p>
               </div>
             </div>
           </CardContent>

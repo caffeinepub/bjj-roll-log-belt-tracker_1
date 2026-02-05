@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAddTechnique, useGetCustomTechniqueTypes, useAddCustomTechniqueType } from '../hooks/useQueries';
+import { useAddTechnique } from '../hooks/useQueries';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,7 @@ import { Loader2, X, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
 import { Technique, SessionTheme } from '../backend';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { SUBMISSION_OPTIONS } from '../lib/submissionOptions';
 
 interface AddTechniqueDialogProps {
   open: boolean;
@@ -43,13 +41,9 @@ export default function AddTechniqueDialog({ open, onOpenChange }: AddTechniqueD
   const [thumbnail, setThumbnail] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [typeSearchOpen, setTypeSearchOpen] = useState(false);
-  const [typeSearchValue, setTypeSearchValue] = useState('');
   const [isLoadingThumbnail, setIsLoadingThumbnail] = useState(false);
 
   const addMutation = useAddTechnique();
-  const { data: customTypes = [] } = useGetCustomTechniqueTypes();
-  const addCustomTypeMutation = useAddCustomTechniqueType();
 
   const resetForm = () => {
     setName('');
@@ -60,7 +54,6 @@ export default function AddTechniqueDialog({ open, onOpenChange }: AddTechniqueD
     setThumbnail(null);
     setTagInput('');
     setTags([]);
-    setTypeSearchValue('');
   };
 
   // Generate thumbnail when link changes
@@ -108,26 +101,6 @@ export default function AddTechniqueDialog({ open, onOpenChange }: AddTechniqueD
     setTags(tags.filter((t) => t !== tag));
   };
 
-  const handleSelectType = (selectedType: string) => {
-    setType(selectedType);
-    setTypeSearchOpen(false);
-    setTypeSearchValue('');
-  };
-
-  const handleCreateType = async () => {
-    const newType = typeSearchValue.trim();
-    if (!newType || customTypes.includes(newType)) return;
-
-    try {
-      await addCustomTypeMutation.mutateAsync(newType);
-      setType(newType);
-      setTypeSearchOpen(false);
-      setTypeSearchValue('');
-    } catch (error) {
-      console.error('Failed to create custom type:', error);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -154,12 +127,6 @@ export default function AddTechniqueDialog({ open, onOpenChange }: AddTechniqueD
       },
     });
   };
-
-  const filteredTypes = customTypes.filter((t) =>
-    t.toLowerCase().includes(typeSearchValue.toLowerCase())
-  );
-
-  const showCreateOption = typeSearchValue.trim() && !customTypes.includes(typeSearchValue.trim());
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -199,83 +166,18 @@ export default function AddTechniqueDialog({ open, onOpenChange }: AddTechniqueD
 
           <div className="space-y-2">
             <Label htmlFor="type">Type</Label>
-            <Popover open={typeSearchOpen} onOpenChange={setTypeSearchOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  id="type"
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={typeSearchOpen}
-                  className="w-full justify-between"
-                >
-                  {type || 'Select or create type...'}
-                  <X
-                    className={cn('ml-2 h-4 w-4 shrink-0 opacity-50', !type && 'hidden')}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setType('');
-                    }}
-                  />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0" align="start">
-                <Command shouldFilter={false}>
-                  <CommandInput
-                    placeholder="Search or create type..."
-                    value={typeSearchValue}
-                    onValueChange={setTypeSearchValue}
-                  />
-                  <CommandList>
-                    <CommandEmpty>
-                      {showCreateOption ? (
-                        <div className="p-2">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start"
-                            onClick={handleCreateType}
-                            disabled={addCustomTypeMutation.isPending}
-                          >
-                            {addCustomTypeMutation.isPending ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Creating...
-                              </>
-                            ) : (
-                              <>Create "{typeSearchValue}"</>
-                            )}
-                          </Button>
-                        </div>
-                      ) : (
-                        'No types found.'
-                      )}
-                    </CommandEmpty>
-                    <CommandGroup>
-                      {filteredTypes.map((t) => (
-                        <CommandItem key={t} value={t} onSelect={() => handleSelectType(t)}>
-                          {t}
-                        </CommandItem>
-                      ))}
-                      {showCreateOption && filteredTypes.length > 0 && (
-                        <CommandItem
-                          value={typeSearchValue}
-                          onSelect={handleCreateType}
-                          className="border-t"
-                        >
-                          {addCustomTypeMutation.isPending ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Creating...
-                            </>
-                          ) : (
-                            <>Create "{typeSearchValue}"</>
-                          )}
-                        </CommandItem>
-                      )}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger id="type">
+                <SelectValue placeholder="Select technique type..." />
+              </SelectTrigger>
+              <SelectContent>
+                {SUBMISSION_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

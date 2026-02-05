@@ -1,12 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Clean up the four belt “Add submission…” controls in the Submission Log by using a dropdown with an integrated search field and real-time filtering.
+**Goal:** Expand analytics on the Profile Analytics and Training Log pages from 4 to 6 metrics/visualizations each, derived from existing session and submission-log data.
 
 **Planned changes:**
-- Update `frontend/src/components/SubmissionSelectInput.tsx` so each belt add-submission control opens a dropdown that shows the full submission list by default and live-filters as the user types.
-- Present the search input as a compact, visually integrated part of the dropdown experience (at/near the top of the opened dropdown), avoiding separation from the trigger.
-- Ensure keyboard accessibility is preserved (type to filter, arrow keys to navigate, enter to select) and that the dropdown closes on selection.
-- Limit changes strictly to the four selected add-submission controls and the minimal supporting code required.
+- Update Profile Analytics (Training Statistics) to show 6 metrics: Total Sessions, Total Training Time (hours), Total Rolls, Submissions Learned (unique submissions at blue belt and above), Favorite Theme, and Average Intensity (mapped consistently to a label), with safe defaults when there are no sessions.
+- Update Training Log analytics to show 6 visualizations: Gi vs No-Gi ratio (pie), Session Theme frequency (pie), Average Rolls per Session (time trend), Intensity trends over time (line), Mood vs Intensity correlation (scatter), and Weekly/Monthly Training Volume (bar) supporting both week/month and hours/sessions views, with an empty-state message when there are no sessions.
 
-**User-visible outcome:** In the Submission Log, each belt’s “Add submission…” dropdown feels cleaner and includes an integrated search that filters options instantly while typing, with full keyboard support.
+**User-visible outcome:** Users see expanded, more detailed analytics on their profile and training log, including new metrics and charts that summarize training volume, themes, intensity, mood relationships, and progress at a glance.

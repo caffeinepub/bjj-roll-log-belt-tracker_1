@@ -226,6 +226,7 @@ export function useUpdateBeltProgress() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['beltProgress'] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['submissionLog'] });
       toast.success('Belt progress updated successfully');
     },
     onError: (error: Error) => {
@@ -409,6 +410,7 @@ export function useGetSubmissionLog() {
     queryFn: async () => {
       if (!actor || !actorReady) {
         return {
+          whiteBelt: [],
           blueBelt: [],
           purpleBelt: [],
           brownBelt: [],
@@ -420,6 +422,7 @@ export function useGetSubmissionLog() {
       } catch (error: any) {
         console.error('Failed to fetch submission log:', error);
         return {
+          whiteBelt: [],
           blueBelt: [],
           purpleBelt: [],
           brownBelt: [],

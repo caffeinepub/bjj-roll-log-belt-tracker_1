@@ -1,11 +1,11 @@
 import Map "mo:core/Map";
 import Array "mo:core/Array";
 import Float "mo:core/Float";
-import Nat "mo:core/Nat";
 import Text "mo:core/Text";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import Time "mo:core/Time";
+import Nat "mo:core/Nat";
 import Principal "mo:core/Principal";
 import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
@@ -34,6 +34,14 @@ actor {
     #noGi;
   };
 
+  type Intensity = {
+    #recoveryFlow;
+    #light;
+    #moderate;
+    #hard;
+    #maxComp;
+  };
+
   type GymInfo = {
     name : Text;
     location : Text;
@@ -48,6 +56,8 @@ actor {
     sessionTheme : SessionTheme;
     rolls : Nat;
     moodRating : Float;
+    beltSnapshot : BeltProgress;
+    intensity : Intensity;
   };
 
   type BeltLevel = {
@@ -62,6 +72,30 @@ actor {
     belt : BeltLevel;
     stripes : Nat;
     imageUrl : Text;
+  };
+
+  type BeltGamifiedStats = {
+    progressionPercent : Float;
+    experiencePercent : Float;
+    submissionProficiencyPercent : Float;
+    techniqueMasteryPercent : Float;
+    progressionRaw : {
+      stripes : Nat;
+      hours : Float;
+      milestoneBonus : Nat;
+    };
+    experienceRaw : {
+      hours : Float;
+    };
+    submissionsRaw : {
+      uniqueCount : Nat;
+      submissions : [SubmissionCount];
+    };
+    masteryRaw : {
+      themeProgress : [(SessionTheme, Float)];
+      totalSessions : Nat;
+      sessionsPerTheme : [(SessionTheme, Nat)];
+    };
   };
 
   type Technique = {
@@ -171,6 +205,7 @@ actor {
   };
 
   type SubmissionLog = {
+    whiteBelt : [SubmissionCount];
     blueBelt : [SubmissionCount];
     purpleBelt : [SubmissionCount];
     brownBelt : [SubmissionCount];
@@ -178,6 +213,7 @@ actor {
   };
 
   type Belt = {
+    #white;
     #blue;
     #purple;
     #brown;
@@ -191,7 +227,7 @@ actor {
   var analyticsData = Map.empty<Principal, Text>();
   var isProfileCreationDone : Map.Map<Principal, Bool> = Map.empty<Principal, Bool>();
   var trainingHours = Map.empty<Principal, Map.Map<Text, Float>>();
-  var submissionLogs : Map.Map<Principal, SubmissionLog> = Map.empty<Principal, SubmissionLog>();
+  var submissionLogs = Map.empty<Principal, SubmissionLog>();
 
   var accessControlState = AccessControl.initState();
 
@@ -213,7 +249,6 @@ actor {
   };
 
   public query ({ caller }) func getTrainingRecords() : async [TrainingSession] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       return [];
     };
@@ -258,19 +293,16 @@ actor {
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) { return null };
     userProfiles.get(caller);
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    ensureUserRole(caller);
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) { return null };
     userProfiles.get(user);
   };
 
   public query ({ caller }) func isProfileCreationCompleted() : async Bool {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       return false;
     };
@@ -361,7 +393,6 @@ actor {
   };
 
   public query ({ caller }) func getBeltProgress() : async ?BeltProgress {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) { return null };
     switch (userProfiles.get(caller)) {
       case (null) { null };
@@ -382,13 +413,11 @@ actor {
   };
 
   public query ({ caller }) func getAllBeltProgress() : async [BeltProgress] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #admin)) { Runtime.trap("Unauthorized: Only admins can view all belt progress") };
     userProfiles.values().toArray().map<UserProfile, BeltProgress>(func(profile) { profile.beltProgress });
   };
 
   public query ({ caller }) func getTechniques() : async [Technique] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) { Runtime.trap("Unauthorized: Only users can view techniques") };
     switch (techniques.get(caller)) {
       case (null) { [] };
@@ -414,7 +443,6 @@ actor {
   };
 
   public query ({ caller }) func getAllTechniques() : async [Technique] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #admin)) { Runtime.trap("Unauthorized: Only admins can view all techniques") };
     let allTechniques = techniques.values().toArray();
     var merged : [Technique] = [];
@@ -440,7 +468,6 @@ actor {
   };
 
   public query ({ caller }) func getCustomTechniqueTypes() : async [Text] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) { Runtime.trap("Unauthorized: Only users can view custom technique types") };
     switch (customTechniqueTypes.get(caller)) {
       case (null) { [] };
@@ -449,7 +476,6 @@ actor {
   };
 
   public query ({ caller }) func getDashboardData() : async Text {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) { Runtime.trap("Unauthorized: Only users can view dashboard data") };
     switch (analyticsData.get(caller)) {
       case (null) { "" };
@@ -464,7 +490,6 @@ actor {
   };
 
   public query ({ caller }) func getThemePreference() : async Text {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) { return "light" };
     switch (userProfiles.get(caller)) {
       case (null) { "light" };
@@ -485,7 +510,6 @@ actor {
   };
 
   public query ({ caller }) func getUserThemePreference(user : Principal) : async Text {
-    ensureUserRole(caller);
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) { return "light" };
     switch (userProfiles.get(user)) {
       case (null) { "light" };
@@ -494,7 +518,6 @@ actor {
   };
 
   public query ({ caller }) func checkProfileStatus() : async { profile : ?UserProfile; isDone : Bool } {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       return { profile = null; isDone = false };
     };
@@ -507,7 +530,6 @@ actor {
   };
 
   public query ({ caller }) func startProfileCreation() : async { profile : ?UserProfile; isDone : Bool } {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       return { profile = null; isDone = false };
     };
@@ -520,7 +542,6 @@ actor {
   };
 
   public query ({ caller }) func getSystemStatus() : async SystemStatus {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #admin)) { Runtime.trap("Unauthorized: Only admins can view system status") };
 
     let profilesCount = userProfiles.size();
@@ -540,7 +561,6 @@ actor {
   };
 
   public query ({ caller }) func getUserProfilesCount() : async Nat {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #admin)) { Runtime.trap("Unauthorized: Only admins can view user profiles count") };
     userProfiles.size();
   };
@@ -587,7 +607,6 @@ actor {
   };
 
   public query ({ caller }) func getTrainingHours(date : Text) : async Float {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can get training hours");
     };
@@ -626,7 +645,6 @@ actor {
   };
 
   public query ({ caller }) func getTrainingHoursRange(startDate : Text, endDate : Text) : async [TrainingHourRecord] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can get training hours range");
     };
@@ -655,7 +673,6 @@ actor {
   };
 
   public query ({ caller }) func getAllTrainingHours() : async [TrainingHourRecord] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can get all training hours");
     };
@@ -712,7 +729,6 @@ actor {
   };
 
   public query ({ caller }) func getTrainingHoursForAllUsers() : async [TrainingHourRecord] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #admin)) {
       Runtime.trap("Unauthorized: Only admins can get all training hours");
     };
@@ -793,7 +809,6 @@ actor {
   };
 
   public query ({ caller }) func getTrainingHoursCount() : async Nat {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can get training hours count");
     };
@@ -805,7 +820,6 @@ actor {
   };
 
   public query ({ caller }) func getUserTrainingHoursCount(user : Principal) : async Nat {
-    ensureUserRole(caller);
     if (not AccessControl.isAdmin(accessControlState, caller) and not (caller == user)) {
       Runtime.trap("Unauthorized: Only admins or the user can get training hours count");
     };
@@ -851,30 +865,28 @@ actor {
   };
 
   public query ({ caller }) func getAllUsersTrainingHours() : async [(Principal, [TrainingHourRecord])] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #admin)) {
       Runtime.trap("Unauthorized: Only admins can get all users' training hours");
     };
 
-    let entries = trainingHours.toArray().map(
-      func((principal, userHoursMap)) {
-        let records = userHoursMap.toArray().map<(?Text, Float), TrainingHourRecord>(
-          func((date, hours)) {
-            {
-              date = switch (date) { case (null) { "" }; case (?text) { text } };
-              hours;
-            };
-          }
-        );
-        (principal, records);
-      }
-    );
+    var allEntries : [(Principal, [TrainingHourRecord])] = [];
 
-    entries;
+    for ((principal, userHoursMap) in trainingHours.entries()) {
+      let userRecords = userHoursMap.toArray().map<(?Text, Float), TrainingHourRecord>(
+        func((date, hours)) {
+          {
+            date = switch (date) { case (null) { "" }; case (?text) { text } };
+            hours;
+          };
+        }
+      );
+      allEntries := allEntries.concat([(principal, userRecords)]);
+    };
+
+    allEntries;
   };
 
   public query ({ caller }) func getSubmissionLog() : async SubmissionLog {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can access their submission log");
     };
@@ -882,6 +894,7 @@ actor {
     switch (submissionLogs.get(caller)) {
       case (null) {
         {
+          whiteBelt = [];
           blueBelt = [];
           purpleBelt = [];
           brownBelt = [];
@@ -918,6 +931,7 @@ actor {
 
     let logWithUniqueCounts = {
       newLog with
+      whiteBelt = ensureUnique(newLog.whiteBelt);
       blueBelt = ensureUnique(newLog.blueBelt);
       purpleBelt = ensureUnique(newLog.purpleBelt);
       brownBelt = ensureUnique(newLog.brownBelt);
@@ -928,7 +942,6 @@ actor {
   };
 
   public query ({ caller }) func hasBeltSubmission(belt : Belt, submissionName : Text) : async Bool {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can check their submission log");
     };
@@ -940,6 +953,7 @@ actor {
     let userLog = switch (submissionLogs.get(caller)) {
       case (null) {
         {
+          whiteBelt = [];
           blueBelt = [];
           purpleBelt = [];
           brownBelt = [];
@@ -950,6 +964,7 @@ actor {
     };
 
     switch (belt) {
+      case (#white) { userLog.whiteBelt.any(func(entry) { matchesName(entry.name.toLower(), submissionName.toLower()) }) };
       case (#blue) { userLog.blueBelt.any(func(entry) { matchesName(entry.name.toLower(), submissionName.toLower()) }) };
       case (#purple) { userLog.purpleBelt.any(func(entry) { matchesName(entry.name.toLower(), submissionName.toLower()) }) };
       case (#brown) { userLog.brownBelt.any(func(entry) { matchesName(entry.name.toLower(), submissionName.toLower()) }) };
@@ -958,7 +973,6 @@ actor {
   };
 
   public query ({ caller }) func getSubmissionCountsByBelt(belt : Text) : async [SubmissionCount] {
-    ensureUserRole(caller);
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Runtime.trap("Unauthorized: Only users can view submission counts by belt");
     };
@@ -969,6 +983,7 @@ actor {
       };
       case (?log) {
         switch (belt) {
+          case ("white") { log.whiteBelt };
           case ("blue") { log.blueBelt };
           case ("purple") { log.purpleBelt };
           case ("brown") { log.brownBelt };

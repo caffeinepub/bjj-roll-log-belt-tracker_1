@@ -28,7 +28,9 @@ export default function SubmissionSelectInput({
   const [searchValue, setSearchValue] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+
+  // Use hard-coded submission options directly
+  const availableOptions = [...SUBMISSION_OPTIONS];
 
   // Get list of already selected submission names (normalized)
   const selectedNames = new Set(
@@ -36,7 +38,7 @@ export default function SubmissionSelectInput({
   );
 
   // Filter options based on search and exclude already selected
-  const filteredOptions = SUBMISSION_OPTIONS.filter((option) => {
+  const filteredOptions = availableOptions.filter((option) => {
     const matchesSearch = option.toLowerCase().includes(searchValue.toLowerCase());
     const notSelected = !selectedNames.has(normalizeSubmissionName(option));
     return matchesSearch && notSelected;
@@ -50,7 +52,10 @@ export default function SubmissionSelectInput({
   // Focus input when dropdown opens
   useEffect(() => {
     if (open && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 0);
+      // Use requestAnimationFrame for more reliable focus
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
     }
   }, [open]);
 
@@ -62,7 +67,7 @@ export default function SubmissionSelectInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (filteredOptions.length === 0) return;
+    if (filteredOptions.length === 0 && e.key !== 'Escape') return;
 
     switch (e.key) {
       case 'ArrowDown':
@@ -103,43 +108,41 @@ export default function SubmissionSelectInput({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0" align="start">
-        <div className="flex flex-col">
-          <div className="border-b p-2">
-            <Input
-              ref={inputRef}
-              placeholder="Search submissions..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="h-9 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-          </div>
-          <ScrollArea className="h-[280px]">
-            <div ref={listRef} className="p-1">
-              {filteredOptions.length === 0 ? (
-                <div className="py-6 text-center text-sm text-muted-foreground">
-                  No submissions found
-                </div>
-              ) : (
-                filteredOptions.map((option, index) => (
-                  <button
-                    key={option}
-                    onClick={() => handleSelect(option)}
-                    onMouseEnter={() => setHighlightedIndex(index)}
-                    className={cn(
-                      'w-full text-left px-3 py-2 text-sm rounded-sm transition-colors',
-                      'hover:bg-accent hover:text-accent-foreground',
-                      'focus:bg-accent focus:text-accent-foreground focus:outline-none',
-                      highlightedIndex === index && 'bg-accent text-accent-foreground'
-                    )}
-                  >
-                    {option}
-                  </button>
-                ))
-              )}
-            </div>
-          </ScrollArea>
+        <div className="p-2 border-b">
+          <Input
+            ref={inputRef}
+            placeholder="Search submissions..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="h-9"
+          />
         </div>
+        <ScrollArea className="h-[280px]">
+          <div className="p-1">
+            {filteredOptions.length === 0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                No submissions found
+              </div>
+            ) : (
+              filteredOptions.map((option, index) => (
+                <button
+                  key={option}
+                  onClick={() => handleSelect(option)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  className={cn(
+                    'w-full text-left px-3 py-2 text-sm rounded-sm transition-colors',
+                    'hover:bg-accent hover:text-accent-foreground',
+                    'focus:bg-accent focus:text-accent-foreground focus:outline-none',
+                    highlightedIndex === index && 'bg-accent text-accent-foreground'
+                  )}
+                >
+                  {option}
+                </button>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   );

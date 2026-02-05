@@ -1,129 +1,87 @@
 import { useState } from 'react';
-import { useGetTrainingRecords, useAddTrainingRecord, useSaveTrainingRecords } from '../hooks/useQueries';
+import { useGetTrainingRecords } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Calendar, Clock, Trash2, Edit2, ChevronDown, ChevronUp, Activity, Target, Smile } from 'lucide-react';
-import { format } from 'date-fns';
+import { Plus, Activity, Target } from 'lucide-react';
 import AddTrainingDialog from './AddTrainingDialog';
-import { TrainingSession, SessionTheme } from '../backend';
-import { Badge } from '@/components/ui/badge';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { TrainingSession, TrainingType } from '../backend';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter } from 'recharts';
 import SubmissionLogSection from './SubmissionLogSection';
-
-const SESSION_THEME_LABELS: Record<SessionTheme, string> = {
-  [SessionTheme.takedowns_standup]: 'Takedowns / Stand-up',
-  [SessionTheme.guardSystems]: 'Guard Systems',
-  [SessionTheme.guardRetention]: 'Guard Retention',
-  [SessionTheme.guardPassing]: 'Guard Passing',
-  [SessionTheme.sweeps]: 'Sweeps',
-  [SessionTheme.pinsControl]: 'Pins & Control',
-  [SessionTheme.backControl]: 'Back Control',
-  [SessionTheme.escapes]: 'Escapes',
-  [SessionTheme.submissions]: 'Submissions',
-  [SessionTheme.legLocks]: 'Leg Locks',
-  [SessionTheme.transitionsScrambles]: 'Transitions & Scrambles',
-  [SessionTheme.turtleGame]: 'Turtle Game',
-  [SessionTheme.openMat]: 'Open Mat',
-};
-
-const MOOD_LABELS = ['Tough', 'Hard', 'Okay', 'Good', 'Great'];
+import TrainingMonthCalendar from './TrainingMonthCalendar';
+import { formatSessionTheme } from '../lib/formatters';
+import {
+  bucketSessionsByWeek,
+  bucketSessionsByMonth,
+  calculateAverageRollsPerBucket,
+  calculateAverageIntensityPerBucket,
+  calculateVolumePerBucket,
+  calculateMoodIntensityCorrelation,
+} from '../lib/trainingAnalytics';
 
 export default function TrainingLog() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<TrainingSession | null>(null);
-  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
-  const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
+  const [volumeTimeframe, setVolumeTimeframe] = useState<'weekly' | 'monthly'>('weekly');
+  const [volumeMetric, setVolumeMetric] = useState<'hours' | 'sessions'>('hours');
 
   const { data: sessions = [], isLoading } = useGetTrainingRecords();
-  const addMutation = useAddTrainingRecord();
-  const saveMutation = useSaveTrainingRecords();
-
-  const sortedSessions = [...sessions].sort((a, b) => Number(b.date - a.date));
-
-  const handleDelete = () => {
-    if (!deletingSessionId) return;
-
-    const updatedSessions = sessions.filter((s) => s.id !== deletingSessionId);
-    saveMutation.mutate(updatedSessions);
-    setDeletingSessionId(null);
-  };
-
-  const handleEdit = (session: TrainingSession) => {
-    setEditingSession(session);
-    setIsAddDialogOpen(true);
-  };
 
   const handleDialogClose = () => {
     setIsAddDialogOpen(false);
     setEditingSession(null);
   };
 
-  const toggleExpanded = (sessionId: string) => {
-    setExpandedSessions((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(sessionId)) {
-        newSet.delete(sessionId);
-      } else {
-        newSet.add(sessionId);
-      }
-      return newSet;
-    });
-  };
-
-  const getMoodLabel = (rating: number): string => {
-    const index = Math.round(rating * (MOOD_LABELS.length - 1));
-    return MOOD_LABELS[Math.max(0, Math.min(index, MOOD_LABELS.length - 1))];
+  const handleEditSession = (session: TrainingSession) => {
+    setEditingSession(session);
+    setIsAddDialogOpen(true);
   };
 
   // Analytics calculations
   const totalSessions = sessions.length;
 
-  // Session theme frequency
+  // 1. Gi vs No-Gi Ratio
+  const giCount = sessions.filter((s) => s.trainingType === TrainingType.gi).length;
+  const noGiCount = sessions.filter((s) => s.trainingType === TrainingType.noGi).length;
+  const giNoGiData = [
+    { name: 'Gi', value: giCount },
+    { name: 'No-Gi', value: noGiCount },
+  ];
+
+  // 2. Session Theme Frequency
   const themeCounts: Record<string, number> = {};
   sessions.forEach((session) => {
-    const themeLabel = SESSION_THEME_LABELS[session.sessionTheme];
+    const themeLabel = formatSessionTheme(session.sessionTheme);
     themeCounts[themeLabel] = (themeCounts[themeLabel] || 0) + 1;
   });
-  const topThemes = Object.entries(themeCounts)
+  const themeData = Object.entries(themeCounts)
     .sort(([, a], [, b]) => b - a)
-    .slice(0, 6)
     .map(([name, value]) => ({ name, value }));
 
-  // Weekly activity (last 4 weeks) - using local time
-  const now = new Date();
-  const weeks = Array.from({ length: 4 }, (_, i) => {
-    const weekStart = new Date(now);
-    weekStart.setDate(weekStart.getDate() - (3 - i) * 7 - now.getDay() + 1);
-    weekStart.setHours(0, 0, 0, 0);
-    
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
-    
-    const weekSessions = sessions.filter((s) => {
-      const sessionDate = new Date(Number(s.date) / 1000000);
-      return sessionDate >= weekStart && sessionDate <= weekEnd;
-    });
-    
-    return {
-      week: format(weekStart, 'MMM d'),
-      sessions: weekSessions.length,
-      hours: Math.round(weekSessions.reduce((sum, s) => sum + Number(s.duration), 0) / 60),
-    };
-  });
+  // 3. Average Rolls per Session (trend over time)
+  const rollsBuckets = bucketSessionsByWeek(sessions, 12);
+  const rollsTrendData = calculateAverageRollsPerBucket(sessions, rollsBuckets);
 
-  const COLORS = ['oklch(var(--chart-1))', 'oklch(var(--chart-2))', 'oklch(var(--chart-3))', 'oklch(var(--chart-4))', 'oklch(var(--chart-5))'];
+  // 4. Intensity Trends Over Time
+  const intensityBuckets = bucketSessionsByWeek(sessions, 12);
+  const intensityTrendData = calculateAverageIntensityPerBucket(sessions, intensityBuckets);
+
+  // 5. Mood vs Intensity Correlation
+  const moodIntensityData = calculateMoodIntensityCorrelation(sessions);
+
+  // 6. Weekly / Monthly Training Volume
+  const volumeBuckets =
+    volumeTimeframe === 'weekly'
+      ? bucketSessionsByWeek(sessions, 12)
+      : bucketSessionsByMonth(sessions, 6);
+  const volumeData = calculateVolumePerBucket(sessions, volumeBuckets, volumeMetric);
+
+  const COLORS = [
+    'oklch(var(--chart-1))',
+    'oklch(var(--chart-2))',
+    'oklch(var(--chart-3))',
+    'oklch(var(--chart-4))',
+    'oklch(var(--chart-5))',
+  ];
 
   if (isLoading) {
     return (
@@ -149,249 +107,307 @@ export default function TrainingLog() {
         </Button>
       </div>
 
-      {sortedSessions.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="rounded-full bg-muted p-4 mb-4">
-              <Calendar className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No training sessions yet</h3>
-            <p className="text-sm text-muted-foreground mb-4">Start logging your training to track your progress</p>
-            <Button
-              onClick={() => setIsAddDialogOpen(true)}
-              variant="outline"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Log Your First Session
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          {/* Recent Sessions Section */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Recent Sessions</h3>
+      {/* Month Calendar View */}
+      <TrainingMonthCalendar sessions={sessions} onEditSession={handleEditSession} />
 
-            <div className="grid gap-3">
-              {sortedSessions.map((session) => {
-                const isExpanded = expandedSessions.has(session.id);
-                // Parse date in local time
-                const sessionDate = new Date(Number(session.date) / 1000000);
-                
-                return (
-                  <Card key={session.id} className="hover:shadow-md transition-shadow">
-                    <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(session.id)}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <CardTitle className="text-base flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                {format(sessionDate, 'MMM d, yyyy')}
-                              </CardTitle>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEdit(session);
-                                  }}
-                                >
-                                  <Edit2 className="h-3.5 w-3.5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setDeletingSessionId(session.id);
-                                  }}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                                </Button>
-                              </div>
-                            </div>
-                            <CardDescription className="flex items-center gap-4 mt-1">
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {Number(session.duration)}m
-                              </span>
-                              <Badge variant="outline" className="text-xs">
-                                {session.trainingType === 'gi' ? 'Gi' : 'No-Gi'}
-                              </Badge>
-                              <span className="text-xs">
-                                {SESSION_THEME_LABELS[session.sessionTheme]}
-                              </span>
-                            </CardDescription>
-                          </div>
-                        </div>
-                      </CardHeader>
+      {/* Submission Log Section - Always visible */}
+      <div className="space-y-4">
+        <SubmissionLogSection />
+      </div>
 
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-center py-2 h-auto">
-                          {isExpanded ? (
-                            <>
-                              <ChevronUp className="h-4 w-4 mr-2" />
-                              Show Less
-                            </>
-                          ) : (
-                            <>
-                              <ChevronDown className="h-4 w-4 mr-2" />
-                              Show Details
-                            </>
-                          )}
-                        </Button>
-                      </CollapsibleTrigger>
+      {/* Analytics Section - Always visible */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold">Training Analytics</h3>
 
-                      <CollapsibleContent>
-                        <CardContent className="space-y-4 pt-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm font-medium mb-1">Number of Rolls</p>
-                              <p className="text-2xl font-bold">{Number(session.rolls)}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium mb-1">Mood</p>
-                              <div className="flex items-center gap-2">
-                                <Smile className="h-5 w-5 text-muted-foreground" />
-                                <p className="text-lg font-semibold">{getMoodLabel(session.moodRating)}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* 1. Gi vs No-Gi Ratio */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Gi vs No-Gi Ratio</CardTitle>
+              <CardDescription>Distribution of training types</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sessions.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No training sessions yet.</p>
+                </div>
+              ) : giCount + noGiCount === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No training type data available.</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={giNoGiData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {giNoGiData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'oklch(var(--card))',
+                        border: '1px solid oklch(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Submission Log Section - Now separate below Recent Sessions */}
-          <div className="space-y-4">
-            <SubmissionLogSection />
-          </div>
+          {/* 2. Session Theme Frequency */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Session Theme Frequency</CardTitle>
+              <CardDescription>Distribution of themes practiced</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sessions.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No training sessions yet.</p>
+                </div>
+              ) : themeData.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No theme data available.</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={themeData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {themeData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'oklch(var(--card))',
+                        border: '1px solid oklch(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Analytics Section */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Training Analytics</h3>
+          {/* 3. Average Rolls per Session */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Average Rolls per Session</CardTitle>
+              <CardDescription>Trend over the last 12 weeks</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sessions.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No training sessions yet.</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={rollsTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="label" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'oklch(var(--card))',
+                        border: '1px solid oklch(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="avgRolls"
+                      stroke="oklch(var(--chart-1))"
+                      strokeWidth={2}
+                      dot={{ fill: 'oklch(var(--chart-1))' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{totalSessions}</div>
-                  <p className="text-xs text-muted-foreground">Training sessions logged</p>
-                </CardContent>
-              </Card>
+          {/* 4. Intensity Trends Over Time */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Intensity Trends Over Time</CardTitle>
+              <CardDescription>Average intensity over the last 12 weeks</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sessions.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No training sessions yet.</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={intensityTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="label" className="text-xs" />
+                    <YAxis domain={[0, 6]} className="text-xs" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'oklch(var(--card))',
+                        border: '1px solid oklch(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="avgIntensity"
+                      stroke="oklch(var(--chart-2))"
+                      strokeWidth={2}
+                      dot={{ fill: 'oklch(var(--chart-2))' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Session Themes</CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{Object.keys(themeCounts).length}</div>
-                  <p className="text-xs text-muted-foreground">Different themes practiced</p>
-                </CardContent>
-              </Card>
-            </div>
+          {/* 5. Mood vs Intensity Correlation */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Mood vs Intensity Correlation</CardTitle>
+              <CardDescription>How intensity affects mood rating</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sessions.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No training sessions yet.</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <ScatterChart>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis
+                      type="number"
+                      dataKey="intensity"
+                      name="Intensity"
+                      domain={[0, 6]}
+                      className="text-xs"
+                      label={{ value: 'Intensity', position: 'insideBottom', offset: -5 }}
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey="mood"
+                      name="Mood"
+                      domain={[0, 1]}
+                      className="text-xs"
+                      label={{ value: 'Mood', angle: -90, position: 'insideLeft' }}
+                    />
+                    <Tooltip
+                      cursor={{ strokeDasharray: '3 3' }}
+                      contentStyle={{
+                        backgroundColor: 'oklch(var(--card))',
+                        border: '1px solid oklch(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Scatter
+                      name="Sessions"
+                      data={moodIntensityData}
+                      fill="oklch(var(--chart-3))"
+                      opacity={0.6}
+                    />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Weekly Activity</CardTitle>
-                  <CardDescription>Training sessions over the last 4 weeks</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={weeks}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis dataKey="week" className="text-xs" />
-                      <YAxis className="text-xs" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'oklch(var(--card))',
-                          border: '1px solid oklch(var(--border))',
-                          borderRadius: '8px',
-                        }}
-                      />
-                      <Bar dataKey="sessions" fill="oklch(var(--chart-1))" radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Session Theme Frequency</CardTitle>
-                  <CardDescription>Your most practiced session themes</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {topThemes.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={topThemes}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {topThemes.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: 'oklch(var(--card))',
-                            border: '1px solid oklch(var(--border))',
-                            borderRadius: '8px',
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No session themes recorded yet</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </>
-      )}
+          {/* 6. Weekly / Monthly Training Volume */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Training Volume</CardTitle>
+              <CardDescription>
+                <div className="flex items-center gap-4 mt-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={volumeTimeframe === 'weekly' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumeTimeframe('weekly')}
+                    >
+                      Weekly
+                    </Button>
+                    <Button
+                      variant={volumeTimeframe === 'monthly' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumeTimeframe('monthly')}
+                    >
+                      Monthly
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={volumeMetric === 'hours' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumeMetric('hours')}
+                    >
+                      Hours
+                    </Button>
+                    <Button
+                      variant={volumeMetric === 'sessions' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumeMetric('sessions')}
+                    >
+                      Sessions
+                    </Button>
+                  </div>
+                </div>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {sessions.length === 0 ? (
+                <div className="flex items-center justify-center h-[300px]">
+                  <p className="text-sm text-muted-foreground">No training sessions yet.</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={volumeData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="label" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'oklch(var(--card))',
+                        border: '1px solid oklch(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Bar dataKey="value" fill="oklch(var(--chart-4))" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       <AddTrainingDialog
         open={isAddDialogOpen}
         onOpenChange={handleDialogClose}
         editingSession={editingSession}
       />
-
-      <AlertDialog open={!!deletingSessionId} onOpenChange={() => setDeletingSessionId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Training Session</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this training session? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

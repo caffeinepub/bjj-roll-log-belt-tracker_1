@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Save, Award, X } from 'lucide-react';
-import { useGetSubmissionLog, useSaveSubmissionLog } from '../hooks/useQueries';
+import { Save, Award, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useGetSubmissionLog, useSaveSubmissionLog, useGetCallerUserProfile } from '../hooks/useQueries';
 import type { SubmissionLog, SubmissionCount } from '../backend';
 import SubmissionSelectInput from './SubmissionSelectInput';
 import {
@@ -12,21 +13,36 @@ import {
   mergeDuplicates,
 } from '../lib/submissionLogUtils';
 
+// Local type for belt levels matching backend BeltProgress.belt structure
+type BeltLevel = 'white' | 'blue' | 'purple' | 'brown' | 'black';
+
 export default function SubmissionLogSection() {
   const { data: savedLog, isLoading } = useGetSubmissionLog();
+  const { data: userProfile } = useGetCallerUserProfile();
   const saveMutation = useSaveSubmissionLog();
 
   const [localLog, setLocalLog] = useState<SubmissionLog>({
+    whiteBelt: [],
     blueBelt: [],
     purpleBelt: [],
     brownBelt: [],
     blackBelt: [],
   });
 
+  // Determine current belt from user profile
+  const currentBeltRaw = userProfile?.beltProgress.belt;
+  const currentBelt: BeltLevel = currentBeltRaw ? String(currentBeltRaw) as BeltLevel : 'white';
+
+  // Selected opponent belt state (defaults to current belt)
+  const [selectedBelt, setSelectedBelt] = useState<BeltLevel>(currentBelt);
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
   // Load saved data and normalize it
   useEffect(() => {
     if (savedLog) {
       setLocalLog({
+        whiteBelt: mergeDuplicates(savedLog.whiteBelt || []),
         blueBelt: mergeDuplicates(savedLog.blueBelt),
         purpleBelt: mergeDuplicates(savedLog.purpleBelt),
         brownBelt: mergeDuplicates(savedLog.brownBelt),
@@ -35,9 +51,15 @@ export default function SubmissionLogSection() {
     }
   }, [savedLog]);
 
+  // Update selected belt when current belt changes
+  useEffect(() => {
+    setSelectedBelt(currentBelt);
+  }, [currentBelt]);
+
   const handleSave = () => {
     // Normalize before saving to ensure no duplicates
     const normalizedLog: SubmissionLog = {
+      whiteBelt: mergeDuplicates(localLog.whiteBelt),
       blueBelt: mergeDuplicates(localLog.blueBelt),
       purpleBelt: mergeDuplicates(localLog.purpleBelt),
       brownBelt: mergeDuplicates(localLog.brownBelt),
@@ -70,6 +92,7 @@ export default function SubmissionLogSection() {
     };
 
     return (
+      !compareArrays(localLog.whiteBelt, savedLog.whiteBelt || []) ||
       !compareArrays(localLog.blueBelt, savedLog.blueBelt) ||
       !compareArrays(localLog.purpleBelt, savedLog.purpleBelt) ||
       !compareArrays(localLog.brownBelt, savedLog.brownBelt) ||
@@ -87,60 +110,75 @@ export default function SubmissionLogSection() {
     );
   }
 
-  const renderBeltSection = (
-    beltKey: keyof SubmissionLog,
-    label: string,
-    colorClass: string
-  ) => {
-    const submissions = localLog[beltKey];
-    const totalCount = submissions.reduce((sum, sub) => sum + Number(sub.count), 0);
-
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h4 className={`text-sm font-semibold ${colorClass}`}>
-            {label} ({totalCount})
-          </h4>
-        </div>
-
-        <SubmissionSelectInput
-          beltLabel={label}
-          submissions={submissions}
-          onAdd={(name) => updateBelt(beltKey, (subs) => addSubmission(subs, name))}
-        />
-
-        <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
-          {submissions.length === 0 ? (
-            <p className="text-xs text-muted-foreground italic">No submissions logged yet</p>
-          ) : (
-            submissions.map((sub) => (
-              <Badge
-                key={sub.name}
-                variant="secondary"
-                className="flex items-center gap-1.5 px-2 py-0.5 text-xs"
-              >
-                <span>{sub.name}</span>
-                <span className="font-bold bg-primary/10 px-1 py-0.5 rounded text-[10px]">
-                  {Number(sub.count)}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-3 w-3 p-0 hover:bg-destructive/20 ml-0.5"
-                  onClick={() => updateBelt(beltKey, (subs) => removeSubmission(subs, sub.name))}
-                >
-                  <X className="h-2.5 w-2.5" />
-                </Button>
-              </Badge>
-            ))
-          )}
-        </div>
-      </div>
-    );
+  // Map BeltLevel to SubmissionLog key
+  const getBeltKey = (belt: BeltLevel): keyof SubmissionLog => {
+    switch (belt) {
+      case 'white':
+        return 'whiteBelt';
+      case 'blue':
+        return 'blueBelt';
+      case 'purple':
+        return 'purpleBelt';
+      case 'brown':
+        return 'brownBelt';
+      case 'black':
+        return 'blackBelt';
+      default:
+        // Exhaustive check - should never reach here
+        const _exhaustive: never = belt;
+        return 'whiteBelt';
+    }
   };
 
+  const getBeltLabel = (belt: BeltLevel): string => {
+    switch (belt) {
+      case 'white':
+        return 'White Belt';
+      case 'blue':
+        return 'Blue Belt';
+      case 'purple':
+        return 'Purple Belt';
+      case 'brown':
+        return 'Brown Belt';
+      case 'black':
+        return 'Black Belt';
+      default:
+        // Exhaustive check - should never reach here
+        const _exhaustive: never = belt;
+        return 'White Belt';
+    }
+  };
+
+  const getBeltColorClass = (belt: BeltLevel): string => {
+    switch (belt) {
+      case 'white':
+        return 'text-gray-600';
+      case 'blue':
+        return 'text-bjj-blue';
+      case 'purple':
+        return 'text-bjj-purple';
+      case 'brown':
+        return 'text-bjj-brown';
+      case 'black':
+        return 'text-bjj-black';
+      default:
+        // Exhaustive check - should never reach here
+        const _exhaustive: never = belt;
+        return 'text-gray-600';
+    }
+  };
+
+  const beltKey = getBeltKey(selectedBelt);
+  const label = getBeltLabel(selectedBelt);
+  const colorClass = getBeltColorClass(selectedBelt);
+  const submissions = localLog[beltKey];
+  const totalCount = submissions.reduce((sum, sub) => sum + Number(sub.count), 0);
+  const displaySubmissions = isExpanded || submissions.length <= 5 ? submissions : submissions.slice(0, 5);
+  const hasMore = submissions.length > 5;
+
   const showSaveButton = hasUnsavedChanges();
+
+  const allBelts: BeltLevel[] = ['white', 'blue', 'purple', 'brown', 'black'];
 
   return (
     <Card className="border-2">
@@ -163,15 +201,97 @@ export default function SubmissionLogSection() {
           )}
         </div>
         <CardDescription>
-          Track submissions you've successfully executed against training partners at same or higher belt levels
+          Track submissions you've successfully executed against different belt levels
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {renderBeltSection('blueBelt', 'Blue Belt', 'text-bjj-blue')}
-          {renderBeltSection('purpleBelt', 'Purple Belt', 'text-bjj-purple')}
-          {renderBeltSection('brownBelt', 'Brown Belt', 'text-bjj-brown')}
-          {renderBeltSection('blackBelt', 'Black Belt', 'text-bjj-black')}
+        <div className="space-y-3">
+          {/* Belt Selector and Add Submission on same row */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+                Opponent Belt:
+              </label>
+              <Select value={selectedBelt} onValueChange={(value) => setSelectedBelt(value as BeltLevel)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {allBelts.map((belt) => (
+                    <SelectItem key={belt} value={belt}>
+                      <span className={getBeltColorClass(belt)}>
+                        {getBeltLabel(belt)}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex-1 w-full sm:w-auto">
+              <SubmissionSelectInput
+                beltLabel={label}
+                submissions={submissions}
+                onAdd={(name) => updateBelt(beltKey, (subs) => addSubmission(subs, name))}
+              />
+            </div>
+          </div>
+
+          {/* Belt Section */}
+          <div className="flex flex-col gap-2">
+            <h4 className={`text-sm font-semibold ${colorClass}`}>
+              {label} ({totalCount})
+            </h4>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
+              {submissions.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">No submissions logged yet</p>
+              ) : (
+                displaySubmissions.map((sub) => (
+                  <Badge
+                    key={sub.name}
+                    variant="secondary"
+                    className="flex items-center gap-1.5 px-2 py-0.5 text-xs"
+                  >
+                    <span>{sub.name}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-3 w-3 p-0 hover:bg-destructive/20 ml-0.5"
+                      onClick={() => updateBelt(beltKey, (subs) => removeSubmission(subs, sub.name))}
+                    >
+                      <X className="h-2.5 w-2.5" />
+                    </Button>
+                  </Badge>
+                ))
+              )}
+            </div>
+            
+            {hasMore && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full text-xs"
+              >
+                {isExpanded ? (
+                  <>
+                    <ChevronUp className="h-3 w-3 mr-1" />
+                    Show less
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3 w-3 mr-1" />
+                    Show more ({submissions.length - 5} more)
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

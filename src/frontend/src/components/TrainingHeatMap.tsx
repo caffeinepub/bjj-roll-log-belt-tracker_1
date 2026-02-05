@@ -1,12 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useGetTrainingRecords, useSaveTrainingRecords } from '../hooks/useQueries';
+import { useGetTrainingRecords } from '../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Flame, Trash2 } from 'lucide-react';
-import { getColorForHours, formatDateLocal, parseDateLocal } from '../lib/utils';
-import type { TrainingSession } from '../backend';
-import { toast } from 'sonner';
+import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
+import { getColorForHours, formatDateLocal } from '../lib/utils';
 
 interface MonthLabel {
   name: string;
@@ -21,7 +19,6 @@ export default function TrainingHeatMap() {
   const [themeKey, setThemeKey] = useState(0);
   
   const { data: sessions = [], isLoading } = useGetTrainingRecords();
-  const saveRecordsMutation = useSaveTrainingRecords();
 
   // Listen for theme changes and immediately trigger color recalculation
   useEffect(() => {
@@ -56,17 +53,6 @@ export default function TrainingHeatMap() {
     
     return hoursMap;
   }, [sessions]);
-
-  // Get sessions for selected date with exact date matching
-  const selectedDateSessions = useMemo(() => {
-    if (!selectedDate) return [];
-    
-    return sessions.filter((session) => {
-      const sessionDate = new Date(Number(session.date) / 1000000);
-      const sessionDateStr = formatDateLocal(sessionDate);
-      return sessionDateStr === selectedDate;
-    });
-  }, [sessions, selectedDate]);
 
   // Generate year grid with exact date anchoring using ISO weekday indexing
   const yearGrid = useMemo(() => {
@@ -186,28 +172,6 @@ export default function TrainingHeatMap() {
       setSelectedDate(null);
     }
   }, [selectedYear, yearGrid]);
-
-  const handleDeleteSession = async (sessionId: string) => {
-    const updatedSessions = sessions.filter((s) => s.id !== sessionId);
-    
-    try {
-      await saveRecordsMutation.mutateAsync(updatedSessions);
-      toast.success('Session deleted successfully');
-      
-      // Clear selection if no more sessions on this date
-      const remainingSessions = updatedSessions.filter((s) => {
-        const sessionDate = new Date(Number(s.date) / 1000000);
-        const sessionDateStr = formatDateLocal(sessionDate);
-        return sessionDateStr === selectedDate;
-      });
-      
-      if (remainingSessions.length === 0) {
-        setSelectedDate(null);
-      }
-    } catch (error) {
-      console.error('Failed to delete session:', error);
-    }
-  };
 
   const handleYearChange = (direction: 'prev' | 'next') => {
     setSelectedYear((prev) => (direction === 'prev' ? prev - 1 : prev + 1));
@@ -360,47 +324,6 @@ export default function TrainingHeatMap() {
           </div>
           <span>More</span>
         </div>
-
-        {/* Selected Date Details */}
-        {selectedDate && selectedDateSessions.length > 0 && (
-          <div className="border-t pt-4 space-y-3">
-            <h4 className="font-semibold text-sm">
-              {parseDateLocal(selectedDate).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </h4>
-            <div className="space-y-2">
-              {selectedDateSessions.map((session) => (
-                <div
-                  key={session.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
-                        {session.trainingType === 'gi' ? 'Gi' : 'No-Gi'}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {Number(session.duration)} minutes
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteSession(session.id)}
-                    disabled={saveRecordsMutation.isPending}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {isLoading && (
           <div className="flex items-center justify-center py-8">

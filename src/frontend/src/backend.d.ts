@@ -63,6 +63,7 @@ export interface ExtendedProfile {
 }
 export interface SubmissionLog {
     blackBelt: Array<SubmissionCount>;
+    whiteBelt: Array<SubmissionCount>;
     brownBelt: Array<SubmissionCount>;
     blueBelt: Array<SubmissionCount>;
     purpleBelt: Array<SubmissionCount>;
@@ -74,7 +75,9 @@ export interface TrainingSession {
     moodRating: number;
     sessionTheme: SessionTheme;
     trainingType: TrainingType;
+    beltSnapshot: BeltProgress;
     rolls: bigint;
+    intensity: Intensity;
 }
 export interface TrainingMilestone {
     id: string;
@@ -130,14 +133,15 @@ export enum Belt {
     blue = "blue",
     purple = "purple",
     black = "black",
-    brown = "brown"
-}
-export enum BeltLevel {
-    blue = "blue",
-    purple = "purple",
-    black = "black",
     brown = "brown",
     white = "white"
+}
+export enum Intensity {
+    recoveryFlow = "recoveryFlow",
+    hard = "hard",
+    light = "light",
+    maxComp = "maxComp",
+    moderate = "moderate"
 }
 export enum SessionTheme {
     openMat = "openMat",

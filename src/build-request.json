@@ -1,37 +1,67 @@
 {
   "kind": "build_request",
-  "title": "Clean up Submission Log add-submission dropdowns with integrated search + live filtering",
+  "title": "Expand Profile Analytics and Training Log analytics from 4 to 6 metrics/visualizations",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the four belt “Add submission…” controls in the Submission Log (the four selected combobox trigger buttons) to use a cleaner dropdown pattern where the full submission options list live-filters as the user types, and the search field is visually integrated with the add-submission control (i.e., the search input is cleanly located in/at the top of the dropdown experience rather than feeling separate from the trigger). Apply changes only to the selected add-submission controls (the four belt combobox triggers), implemented via frontend/src/components/SubmissionSelectInput.tsx.",
+      "text": "Update the Profile Analytics page (frontend/src/components/ProfileAnalytics.tsx) so the \"Training Statistics\" section displays 6 metrics (instead of the current 4), using the existing per-user training sessions data and submission log data: (1) Total Sessions (count of sessions), (2) Total Training Time (sum of session duration converted to hours), (3) Total Rolls (sum of session.rolls), (4) Submissions Learned (count of unique submission names achieved at blue belt and above, derived from the user submission log arrays for blue/purple/brown/black), (5) Favorite Theme (most frequent sessionTheme across sessions, displayed using the existing theme label formatter), and (6) Average Intensity (average of session.intensity across sessions, using a consistent numeric mapping and displayed as a label).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1",
+          "msg-2"
         ],
         "quotes": [
-          "Create a cleaner Search/Filters Dropdowns where the complete list filters as you search for them. The search field area should be cleanly located where the add submission buttons with a nice dropdown."
+          "For the profile analytics training statistics we have 4 metrics make it 6 metrics: Total Sessions – How many training sessions the user has completed. Total Training Time – Sum of hours spent on the mat. Total Rolls – Total sparring rounds completed. Submissions Learned – Total unique submissions achieved at blue belt and above. Favorite Theme – Most practiced theme (e.g., Guard Passing, Sweeps). Average Intensity – Overall session intensity (flow → extreme).",
+          "ready, please implement."
         ]
       },
       "acceptanceCriteria": [
-        "Each belt’s add-submission control opens a dropdown that shows the complete options list by default and filters the list in real time as the user types.",
-        "The search input is presented as part of the dropdown experience in a clean, compact way (no visually awkward separation between the trigger and the search field).",
-        "The dropdown remains keyboard-accessible (type to filter, arrow keys to navigate, enter to select) and closes upon selection.",
-        "No other Submission Log elements outside the four selected add-submission controls are modified."
+        "Profile Analytics \"Training Statistics\" renders exactly 6 metric tiles/cards corresponding to the requested list.",
+        "Total Rolls equals the sum of TrainingSession.rolls across all loaded sessions.",
+        "Submissions Learned counts unique submission names across blueBelt, purpleBelt, brownBelt, and blackBelt submission log arrays (case-insensitive uniqueness).",
+        "Favorite Theme shows the most frequent theme label derived from TrainingSession.sessionTheme via the existing formatter.",
+        "Average Intensity is computed from all sessions with a consistent ordinal mapping of the existing Intensity enum and displays a sensible label (and a safe fallback when there are no sessions).",
+        "When there are 0 sessions, all six metrics display safe defaults (e.g., 0 / N/A) without throwing."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Update the Training Log analytics section (frontend/src/components/TrainingLog.tsx) so it provides 6 analytics visualizations (instead of the current 4), based on existing TrainingSession fields (trainingType, sessionTheme, rolls, intensity, moodRating, duration, date): (1) Gi vs No-Gi Ratio as a pie chart showing percentage of sessions by trainingType, (2) Session Theme Frequency as a pie chart showing distribution of themes practiced, (3) Average Rolls per Session as a time trend chart, (4) Intensity Trends Over Time as a line chart over time (average intensity per time bucket), (5) Mood vs Intensity Correlation as a scatter plot (moodRating vs intensity numeric), and (6) Weekly / Monthly Training Volume as a bar chart showing total hours or sessions per week/month (include a simple toggle for Weekly vs Monthly and Hours vs Sessions, or otherwise clearly support both weekly/monthly and hours/sessions without adding backend APIs).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-2"
+        ],
+        "quotes": [
+          "For training analytics section in training log tab we have 4 metrics make it 6: Gi vs No-Gi Ratio – Pie chart showing % of sessions in Gi vs No-Gi. Session Theme Frequency – Pie chart showing distribution of themes practiced (Sweeps, Guard Passing, Submissions, etc.). Average Rolls per Session – Trend over time to track engagement in sparring. Intensity Trends Over Time – Line graph showing whether the user is training harder or easing off. Mood vs Intensity Correlation – Scatter or heat map to see if higher intensity sessions affect mood. Weekly / Monthly Training Volume – Bar chart showing total hours or sessions per week/month to spot streaks or gaps.",
+          "ready, please implement."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Training Log renders 6 analytics visualizations matching the requested list, and all charts render without runtime errors.",
+        "Gi vs No-Gi ratio uses TrainingSession.trainingType and displays correct proportions for the loaded sessions.",
+        "Session Theme Frequency chart uses TrainingSession.sessionTheme formatted to human-readable labels.",
+        "Average Rolls per Session trend derives from TrainingSession.rolls and is grouped into consistent time buckets (e.g., by week or month) with deterministic ordering.",
+        "Intensity trend converts the Intensity enum to a numeric scale consistently and charts the aggregated intensity over time.",
+        "Mood vs Intensity correlation chart plots one point per session (or per bucket, if explicitly chosen) using moodRating and intensity numeric values.",
+        "Weekly/Monthly volume chart supports both week and month aggregation and supports showing either hours (duration-derived) or sessions (count).",
+        "If sessions.length === 0, each visualization area shows a clear empty-state message (in English) rather than an empty/broken chart."
       ]
     }
   ],
   "constraints": [
-    "Apply changes ONLY to the four selected elements (the four belt add-submission combobox trigger buttons) and the minimal supporting code necessary to implement them (i.e., SubmissionSelectInput.tsx).",
-    "Do not edit any files under frontend/src/components/ui (read-only shadcn components)."
+    "Do not modify any files under frontend/src/components/ui (shadcn components must be composed, not edited).",
+    "Do not edit files in frontend immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
+    "Keep the backend as a single-actor Motoko canister; do not introduce additional backend services.",
+    "Use English for any user-facing text added/changed as part of these analytics updates."
   ],
   "nonGoals": [
-    "Do not remove the plus/minus controls on submission tags (not part of the selected elements in this prompt).",
-    "Do not change submission tag sizing/layout (not part of the selected elements in this prompt).",
-    "Do not change or remove the Submission Log Save button behavior (not part of the selected elements in this prompt).",
-    "Do not change backend data models or persistence behavior."
+    "Do not redeploy or change deployment/versioning behavior as part of this build request.",
+    "Do not change backend data models or add new backend APIs solely for these analytics (derive analytics from existing session/submission-log data already fetched by the frontend).",
+    "Do not address the separate mood icon asset filename mismatch issue unless it directly blocks the analytics work."
   ],
   "imageRequirements": {
     "required": [],

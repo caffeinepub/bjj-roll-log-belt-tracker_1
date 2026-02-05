@@ -1,40 +1,43 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-03T12:42:13.985Z",
-  "summary": "REQ-1’s integrated-search, live-filtering dropdown behavior appears to be implemented in SubmissionSelectInput.tsx (Popover with an Input in the dropdown, filtering SUBMISSION_OPTIONS as the user types, keyboard handling, and closing on selection). However, the diff also modifies files outside the minimal allowed scope (SubmissionLogSection.tsx and meta/state summary files), which violates the constraint/AC that no other Submission Log elements outside the four selected add-submission controls are modified.",
+  "generatedAt": "2026-02-05T00:56:37.882Z",
+  "summary": "Diff adds a new shared analytics helper module and updates ProfileAnalytics and TrainingLog toward the requested 6-metric/6-visualization expansion. However, some acceptance criteria cannot be confirmed from the truncated diffs, and at least the Training Log empty-state requirement is not evidenced.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "No other Submission Log elements outside the four selected add-submission controls are modified.",
-      "reason": "The diff shows changes to frontend/src/components/SubmissionLogSection.tsx, which is outside the explicitly allowed minimal supporting code (SubmissionSelectInput.tsx).",
+      "requirement": "Profile Analytics \"Training Statistics\" renders exactly 6 metric tiles/cards corresponding to the requested list.",
+      "reason": "The diff shows calculations for multiple metrics (sessions, hours, rolls, submissions learned, favorite theme, average intensity), but the render portion where the \"Training Statistics\" tiles/cards are displayed is truncated, so it cannot be verified that exactly 6 tiles are rendered and mapped to the required metrics.",
       "evidence": [
-        "frontend/src/components/SubmissionLogSection.tsx"
-      ]
-    }
-  ],
-  "hallucinated_features": [
-    {
-      "description": "Added/modified submission log normalization and unsaved-changes comparison logic in SubmissionLogSection (e.g., mergeDuplicates usage on load/save and hasUnsavedChanges comparator).",
-      "reason": "Not requested by REQ-1 (which only asks for dropdown/search UX changes on the four add-submission combobox triggers via SubmissionSelectInput.tsx).",
-      "evidence": [
-        "frontend/src/components/SubmissionLogSection.tsx"
+        "frontend/src/components/ProfileAnalytics.tsx (truncated)"
       ]
     },
     {
-      "description": "Updated repository meta/state summary files.",
-      "reason": "Not requested by REQ-1 and outside the allowed minimal scope for implementing the dropdown UX change.",
+      "id": "REQ-1",
+      "requirement": "Total Training Time is the sum of session duration converted to hours (safe defaults when 0 sessions).",
+      "reason": "ProfileAnalytics computes `totalMinutes` then `totalHours = Math.round(totalMinutes / 60)`; this indicates rounding to a whole hour, which may not match the requirement of summing duration and converting to hours (potentially fractional). Also, a dedicated `durationToHours(durationMinutes: bigint)` helper was added but is not used in the shown component code.",
       "evidence": [
-        "frontend-file-summaries.txt",
-        "project_state.json"
+        "frontend/src/components/ProfileAnalytics.tsx (truncated)",
+        "frontend/src/lib/trainingAnalytics.ts (durationToHours)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "If sessions.length === 0, each visualization area shows a clear empty-state message (in English) rather than an empty/broken chart.",
+      "reason": "TrainingLog includes an overall loading state, but the truncated diff does not show any per-visualization empty-state handling when `sessions` is empty; charts appear to be computed/rendered regardless.",
+      "evidence": [
+        "frontend/src/components/TrainingLog.tsx (truncated)"
       ]
     }
   ],
-  "confidence": 0.74,
+  "hallucinated_features": [],
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/SubmissionLogSection.tsx",
-    "frontend/src/components/SubmissionSelectInput.tsx",
+    "frontend/src/components/ProfileAnalytics.tsx",
+    "frontend/src/components/TrainingLog.tsx",
+    "frontend/src/lib/intensityUtils.ts",
+    "frontend/src/lib/trainingAnalytics.ts",
     "project_state.json"
   ]
 }

@@ -8,9 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, User, Upload, X, ArrowLeft } from 'lucide-react';
-import { BeltLevel, ExternalBlob } from '../backend';
+import { ExternalBlob } from '../backend';
 import { getBeltImageUrl } from '../lib/beltUtils';
 import { cn } from '@/lib/utils';
+
+type BeltLevel = 'white' | 'blue' | 'purple' | 'brown' | 'black';
 
 interface ProfileSetupProps {
   isEditing: boolean;
@@ -20,7 +22,7 @@ interface ProfileSetupProps {
 export default function ProfileSetup({ isEditing, onComplete }: ProfileSetupProps) {
   const { data: existingProfile } = useGetCallerUserProfile();
   const [username, setUsername] = useState('');
-  const [belt, setBelt] = useState<BeltLevel>(BeltLevel.white);
+  const [belt, setBelt] = useState<BeltLevel>('white');
   const [stripes, setStripes] = useState(0);
   const [profilePicture, setProfilePicture] = useState<ExternalBlob | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
@@ -39,7 +41,7 @@ export default function ProfileSetup({ isEditing, onComplete }: ProfileSetupProp
   useEffect(() => {
     if (isEditing && existingProfile) {
       setUsername(existingProfile.username);
-      setBelt(existingProfile.beltProgress.belt);
+      setBelt(existingProfile.beltProgress.belt as BeltLevel);
       setStripes(Number(existingProfile.beltProgress.stripes));
       
       if (existingProfile.profilePicture) {
@@ -101,7 +103,7 @@ export default function ProfileSetup({ isEditing, onComplete }: ProfileSetupProp
       // Reset form to original values
       if (existingProfile) {
         setUsername(existingProfile.username);
-        setBelt(existingProfile.beltProgress.belt);
+        setBelt(existingProfile.beltProgress.belt as BeltLevel);
         setStripes(Number(existingProfile.beltProgress.stripes));
         
         if (existingProfile.profilePicture) {
@@ -226,7 +228,7 @@ export default function ProfileSetup({ isEditing, onComplete }: ProfileSetupProp
             <User className="h-8 w-8 text-white" />
           </div>
           <CardTitle className="text-2xl">
-            {isEditing ? 'Edit Profile' : 'Welcome to BJJ Roll Log'}
+            {isEditing ? 'Edit Profile' : 'Welcome to Jiu-Jitsu Journey'}
           </CardTitle>
           <CardDescription>
             {isEditing ? 'Update your profile information' : 'Complete your profile to start tracking your BJJ journey'}
@@ -310,11 +312,11 @@ export default function ProfileSetup({ isEditing, onComplete }: ProfileSetupProp
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={BeltLevel.white}>White Belt</SelectItem>
-                    <SelectItem value={BeltLevel.blue}>Blue Belt</SelectItem>
-                    <SelectItem value={BeltLevel.purple}>Purple Belt</SelectItem>
-                    <SelectItem value={BeltLevel.brown}>Brown Belt</SelectItem>
-                    <SelectItem value={BeltLevel.black}>Black Belt</SelectItem>
+                    <SelectItem value="white">White Belt</SelectItem>
+                    <SelectItem value="blue">Blue Belt</SelectItem>
+                    <SelectItem value="purple">Purple Belt</SelectItem>
+                    <SelectItem value="brown">Brown Belt</SelectItem>
+                    <SelectItem value="black">Black Belt</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

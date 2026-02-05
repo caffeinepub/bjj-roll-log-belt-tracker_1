@@ -46,12 +46,11 @@ export default function Header({ onProfileClick }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-bjj-blue to-bjj-purple">
-            <span className="text-xl font-bold text-white">BJJ</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-bjj-blue to-bjj-purple flex-shrink-0">
+            <span className="text-xl font-bold text-white">🥋</span>
           </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Roll Log</h1>
-            <p className="text-xs text-muted-foreground">Track Your Journey</p>
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight truncate">Jiu-Jitsu Journey</h1>
           </div>
         </div>
 

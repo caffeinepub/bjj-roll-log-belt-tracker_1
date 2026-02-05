@@ -1,24 +1,41 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-03T12:42:14.020Z",
+  "generatedAt": "2026-02-05T00:56:37.899Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the four belt “Add submission…” controls in the Submission Log (the four selected combobox trigger buttons) to use a cleaner dropdown pattern where the full submission options list live-filters as the user types, and the search field is visually integrated with the add-submission control (i.e., the search input is cleanly located in/at the top of the dropdown experience rather than feeling separate from the trigger). Apply changes only to the selected add-submission controls (the four belt combobox triggers), implemented via frontend/src/components/SubmissionSelectInput.tsx.",
+        "summary": "Update the Profile Analytics page (frontend/src/components/ProfileAnalytics.tsx) so the \"Training Statistics\" section displays 6 metrics (instead of the current 4), using the existing per-user training sessions data and submission log data: (1) Total Sessions (count of sessions), (2) Total Training Time (sum of session duration converted to hours), (3) Total Rolls (sum of session.rolls), (4) Submissions Learned (count of unique submission names achieved at blue belt and above, derived from the user submission log arrays for blue/purple/brown/black), (5) Favorite Theme (most frequent sessionTheme across sessions, displayed using the existing theme label formatter), and (6) Average Intensity (average of session.intensity across sessions, using a consistent numeric mapping and displayed as a label).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/SubmissionSelectInput.tsx"
+          "frontend/src/lib/intensityUtils.ts",
+          "frontend/src/lib/trainingAnalytics.ts",
+          "frontend/src/components/ProfileAnalytics.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/SubmissionSelectInput.tsx"
+          "frontend/src/lib/intensityUtils.ts",
+          "frontend/src/lib/trainingAnalytics.ts",
+          "frontend/src/components/ProfileAnalytics.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Update the Training Log analytics section (frontend/src/components/TrainingLog.tsx) so it provides 6 analytics visualizations (instead of the current 4), based on existing TrainingSession fields (trainingType, sessionTheme, rolls, intensity, moodRating, duration, date): (1) Gi vs No-Gi Ratio as a pie chart showing percentage of sessions by trainingType, (2) Session Theme Frequency as a pie chart showing distribution of themes practiced, (3) Average Rolls per Session as a time trend chart, (4) Intensity Trends Over Time as a line chart over time (average intensity per time bucket), (5) Mood vs Intensity Correlation as a scatter plot (moodRating vs intensity numeric), and (6) Weekly / Monthly Training Volume as a bar chart showing total hours or sessions per week/month (include a simple toggle for Weekly vs Monthly and Hours vs Sessions, or otherwise clearly support both weekly/monthly and hours/sessions without adding backend APIs).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/trainingAnalytics.ts",
+          "frontend/src/components/TrainingLog.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/trainingAnalytics.ts",
+          "frontend/src/components/TrainingLog.tsx"
         ]
       }
     ]
@@ -28,8 +45,10 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/SubmissionLogSection.tsx",
-    "frontend/src/components/SubmissionSelectInput.tsx",
+    "frontend/src/components/ProfileAnalytics.tsx",
+    "frontend/src/components/TrainingLog.tsx",
+    "frontend/src/lib/intensityUtils.ts",
+    "frontend/src/lib/trainingAnalytics.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

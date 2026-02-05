@@ -16,7 +16,7 @@ export default function LoginScreen() {
             <span className="text-3xl font-bold text-white">BJJ</span>
           </div>
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">Roll Log & Belt Tracker</h1>
+            <h1 className="text-4xl font-bold tracking-tight">Jiu-Jitsu Journey</h1>
             <p className="mt-2 text-lg text-muted-foreground">Track your Brazilian Jiu-Jitsu journey</p>
           </div>
         </div>

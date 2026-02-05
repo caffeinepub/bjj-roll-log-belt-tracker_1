@@ -12,7 +12,7 @@ export function formatSessionTheme(theme: SessionTheme): string {
     [SessionTheme.escapes]: 'Escapes',
     [SessionTheme.submissions]: 'Submissions',
     [SessionTheme.legLocks]: 'Leg Locks',
-    [SessionTheme.transitionsScrambles]: 'Transitions & Scrambles',
+    [SessionTheme.transitionsScrambles]: 'Transitions',
     [SessionTheme.turtleGame]: 'Turtle Game',
     [SessionTheme.openMat]: 'Open Mat',
   };
