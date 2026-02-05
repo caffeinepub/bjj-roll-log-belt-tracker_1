@@ -1,59 +1,28 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T03:52:50.694Z",
+  "generatedAt": "2026-02-05T04:49:39.229Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Implement an animated, Google Lens-style multicolor gradient glow highlight (blue → green → yellow → red tones) that works in both light and dark themes, and expose it as reusable styling (Tailwind utilities and/or CSS utility classes) so it can be applied consistently to the specified UI elements only.",
+        "summary": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css"
+          "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
+          "frontend/src/components/BeltTracker.tsx",
+          "frontend/src/components/CompletedBeltStageStatsCard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Update the header branding area to use the animated Google Lens-style gradient glow styling ONLY for: (a) the “Jiu-Jitsu Journey” name text, and (b) the Profile button (desktop profile button in the header). Do not apply the new glow styling to other header controls (theme toggle, logout, etc.).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Header.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Update the dashboard tab navigation so that ONLY the selected tab buttons (Profile Analytics, Training Log, Belt Tracker, Techniques) use the animated Google Lens-style multicolor gradient as the entire button background, in both light and dark themes. Non-selected tabs must keep their current styling (no multicolor gradient background).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/Dashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/Dashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Update the welcome/login page to apply the animated Google Lens-style multicolor gradient glow styling ONLY to: (a) the BJJ icon at the top of the page, (b) the “Login with Internet Identity” button, and (c) the four rounded areas on the welcome page (the rounded info panel inside the Welcome card and the three rounded feature tiles). Ensure the page remains readable and accessible in both light and dark themes.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/LoginScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/LoginScreen.tsx"
+          "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
+          "frontend/src/components/BeltTracker.tsx",
+          "frontend/src/components/CompletedBeltStageStatsCard.tsx"
         ]
       }
     ]
@@ -63,10 +32,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/LoginScreen.tsx",
-    "frontend/src/index.css",
-    "frontend/src/pages/Dashboard.tsx",
+    "frontend/src/components/BeltTracker.tsx",
+    "frontend/src/components/CompletedBeltStageStatsCard.tsx",
+    "frontend/src/lib/submissionProficiencyTooltipCopy.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

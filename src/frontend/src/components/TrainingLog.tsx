@@ -340,8 +340,8 @@ export default function TrainingLog() {
             <CardHeader>
               <CardTitle>Training Volume</CardTitle>
               <CardDescription>
-                <div className="flex items-center gap-4 mt-2">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 mt-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
                     <Button
                       variant={volumeTimeframe === 'weekly' ? 'default' : 'outline'}
                       size="sm"
@@ -357,7 +357,7 @@ export default function TrainingLog() {
                       Monthly
                     </Button>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
                     <Button
                       variant={volumeMetric === 'hours' ? 'default' : 'outline'}
                       size="sm"

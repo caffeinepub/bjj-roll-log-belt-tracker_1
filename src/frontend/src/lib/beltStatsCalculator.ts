@@ -1,4 +1,4 @@
-import type { TrainingSession, SubmissionLog } from '../backend';
+import type { TrainingSession, SubmissionLog, BeltStageHistory } from '../backend';
 
 type BeltLevel = 'white' | 'blue' | 'purple' | 'brown' | 'black';
 type SessionTheme = 'takedowns_standup' | 'guardSystems' | 'guardRetention' | 'guardPassing' | 'sweeps' | 'pinsControl' | 'backControl' | 'escapes' | 'submissions' | 'legLocks' | 'transitionsScrambles' | 'turtleGame' | 'openMat';
@@ -53,12 +53,56 @@ export function calculateBeltGamifiedStats(
   currentBelt: BeltLevel,
   currentStripes: number,
   trainingSessions: TrainingSession[],
-  submissionLog: SubmissionLog
+  submissionLog: SubmissionLog,
+  beltStageHistory?: BeltStageHistory
 ): BeltGamifiedStats {
-  // Filter sessions for current belt
-  const currentBeltSessions = trainingSessions.filter(
-    (session) => session.beltSnapshot.belt === currentBelt
+  // Find the active belt stage for the current belt
+  const activeBeltStage = beltStageHistory?.find(
+    (stage) => stage.beltLevel === currentBelt && !stage.endTime
   );
+
+  let currentBeltSessions: TrainingSession[];
+  let uniqueSubmissionCount: number;
+
+  if (activeBeltStage) {
+    // Belt-stage-aware calculation: filter sessions by stage time window
+    const stageStartTime = Number(activeBeltStage.startTime);
+    currentBeltSessions = trainingSessions.filter((session) => {
+      const sessionTime = Number(session.date);
+      return sessionTime >= stageStartTime;
+    });
+
+    // Use submission counts from the stage
+    uniqueSubmissionCount = activeBeltStage.submissionCounts.length;
+  } else {
+    // Legacy fallback: filter by session.beltSnapshot.belt
+    currentBeltSessions = trainingSessions.filter(
+      (session) => session.beltSnapshot.belt === currentBelt
+    );
+
+    // Count unique submissions from submission log
+    let currentBeltSubmissions: Array<{ name: string; count: bigint }> = [];
+    
+    switch (currentBelt) {
+      case 'white':
+        currentBeltSubmissions = submissionLog.whiteBelt || [];
+        break;
+      case 'blue':
+        currentBeltSubmissions = submissionLog.blueBelt || [];
+        break;
+      case 'purple':
+        currentBeltSubmissions = submissionLog.purpleBelt || [];
+        break;
+      case 'brown':
+        currentBeltSubmissions = submissionLog.brownBelt || [];
+        break;
+      case 'black':
+        currentBeltSubmissions = submissionLog.blackBelt || [];
+        break;
+    }
+
+    uniqueSubmissionCount = currentBeltSubmissions.length;
+  }
 
   // Calculate hours at current belt
   const hoursAtBelt = currentBeltSessions.reduce((total, session) => {
@@ -80,30 +124,6 @@ export function calculateBeltGamifiedStats(
   const experiencePercent = Math.min(100, Math.pow(hoursAtBelt / 600, 0.6) * 100);
 
   // 3. Submission Proficiency Calculation
-  // Count unique submissions for the current belt only
-  let currentBeltSubmissions: Array<{ name: string; count: bigint }> = [];
-  
-  switch (currentBelt) {
-    case 'white':
-      currentBeltSubmissions = submissionLog.whiteBelt || [];
-      break;
-    case 'blue':
-      currentBeltSubmissions = submissionLog.blueBelt || [];
-      break;
-    case 'purple':
-      currentBeltSubmissions = submissionLog.purpleBelt || [];
-      break;
-    case 'brown':
-      currentBeltSubmissions = submissionLog.brownBelt || [];
-      break;
-    case 'black':
-      currentBeltSubmissions = submissionLog.blackBelt || [];
-      break;
-  }
-
-  // Count unique submissions (not total count)
-  const uniqueSubmissionCount = currentBeltSubmissions.length;
-
   const threshold = SUBMISSION_THRESHOLDS[currentBelt] || 0;
   const submissionProficiencyPercent = threshold > 0 ? Math.min(100, (uniqueSubmissionCount / threshold) * 100) : 0;
 

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActorWrapper } from './useActorWrapper';
+import { useInternetIdentity } from './useInternetIdentity';
 import type {
   UserProfile,
   TrainingSession,
@@ -10,6 +11,7 @@ import type {
   Time,
   TrainingHourRecord,
   SubmissionLog,
+  BeltStageHistory,
 } from '../backend';
 import { toast } from 'sonner';
 
@@ -227,6 +229,7 @@ export function useUpdateBeltProgress() {
       queryClient.invalidateQueries({ queryKey: ['beltProgress'] });
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
       queryClient.invalidateQueries({ queryKey: ['submissionLog'] });
+      queryClient.invalidateQueries({ queryKey: ['beltStageHistory'] });
       toast.success('Belt progress updated successfully');
     },
     onError: (error: Error) => {
@@ -454,5 +457,37 @@ export function useSaveSubmissionLog() {
       console.error('Failed to save submission log:', error.message);
       toast.error(`Failed to save submission log: ${error.message}`);
     },
+  });
+}
+
+// Belt Stage History Queries
+export function useGetBeltStageHistory() {
+  const { actor, isFetching: actorFetching, actorReady } = useActorWrapper();
+  const { identity } = useInternetIdentity();
+
+  return useQuery<BeltStageHistory>({
+    queryKey: ['beltStageHistory'],
+    queryFn: async () => {
+      if (!actor || !actorReady || !identity) {
+        return [];
+      }
+      try {
+        const principal = identity.getPrincipal();
+        return await actor.getBeltStageHistory(principal);
+      } catch (error: any) {
+        const errorMessage = error.message || String(error);
+        console.error('[BeltStageHistory] Fetch error:', errorMessage);
+        
+        // Handle authorization errors gracefully - treat as empty history
+        if (errorMessage.includes('Unauthorized') || errorMessage.includes('Can only view your own')) {
+          return [];
+        }
+        
+        return [];
+      }
+    },
+    enabled: !!actor && !actorFetching && actorReady && !!identity,
+    retry: false,
+    staleTime: 30000,
   });
 }

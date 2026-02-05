@@ -1,94 +1,36 @@
 {
   "kind": "build_request",
-  "title": "Add animated Google Lens-style multicolor gradient glow highlights to specified UI elements",
+  "title": "Define exact per-belt submission tooltip copy (with correct targets)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Implement an animated, Google Lens-style multicolor gradient glow highlight (blue → green → yellow → red tones) that works in both light and dark themes, and expose it as reusable styling (Tailwind utilities and/or CSS utility classes) so it can be applied consistently to the specified UI elements only.",
+      "text": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "Colour Design - I want add more colour to the app in the style of a modern, sleek, start up with Google “Lens-style” highlight theme.",
-          "1. Yes",
-          "2. Both"
+          "1. list the exact tooltip text for each belt so know they are right."
         ]
       },
       "acceptanceCriteria": [
-        "A visible multicolor gradient glow effect animates subtly over time (not static).",
-        "The effect renders appropriately in both light mode and dark mode (no unreadable text, no extreme bloom that reduces contrast).",
-        "The effect is available as a reusable class or small set of classes that can be applied to multiple components without duplicating large style blocks."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Update the header branding area to use the animated Google Lens-style gradient glow styling ONLY for: (a) the “Jiu-Jitsu Journey” name text, and (b) the Profile button (desktop profile button in the header). Do not apply the new glow styling to other header controls (theme toggle, logout, etc.).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Only apply changes to the following: 1. In the header - Jiu-Jitsu Journey name, Profile Button"
-        ]
-      },
-      "acceptanceCriteria": [
-        "In the header, the “Jiu-Jitsu Journey” title shows the animated multicolor glow highlight.",
-        "The desktop Profile button (username button) shows the animated multicolor glow highlight.",
-        "Theme toggle and Logout button styling remain unchanged compared to current behavior (aside from any incidental layout shifts that must be avoided)."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Update the dashboard tab navigation so that ONLY the selected tab buttons (Profile Analytics, Training Log, Belt Tracker, Techniques) use the animated Google Lens-style multicolor gradient as the entire button background, in both light and dark themes. Non-selected tabs must keep their current styling (no multicolor gradient background).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "2. The tab buttons that are selected (Profile Analytics, Training Logs, Belt Tracker, Techniques)",
-          "3. The Entire Button"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When a tab is active/selected, its full background shows the animated multicolor gradient (not just an outline).",
-        "When a tab is not active, it does not show the multicolor gradient background/glow.",
-        "Switching tabs updates the highlighted styling immediately and reliably."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Update the welcome/login page to apply the animated Google Lens-style multicolor gradient glow styling ONLY to: (a) the BJJ icon at the top of the page, (b) the “Login with Internet Identity” button, and (c) the four rounded areas on the welcome page (the rounded info panel inside the Welcome card and the three rounded feature tiles). Ensure the page remains readable and accessible in both light and dark themes.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "3. For the welcome page - The BJJ Icon, The sign in with internet Identity Button, and the 4 rounded area on the welcome page."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The top BJJ icon shows the animated multicolor glow highlight.",
-        "The “Login with Internet Identity” button shows the animated multicolor glow highlight.",
-        "Exactly four rounded areas on the welcome page show the animated multicolor styling: the rounded info panel under the login button and the three feature tiles at the bottom.",
-        "Other welcome page elements keep their current styling (no additional areas pick up the multicolor glow unintentionally)."
+        "White Belt tooltip text is exactly: \"Unique submissions for White Belt. Target: 5. Counts only on: Blue Belt and higher.\"",
+        "Blue Belt tooltip text is exactly: \"Unique submissions for Blue Belt. Target: 25. Counts only on: Blue Belt and higher.\"",
+        "Purple Belt tooltip text is exactly: \"Unique submissions for Purple Belt. Target: 40. Counts only on: Blue Belt and higher.\"",
+        "Brown Belt tooltip text is exactly: \"Unique submissions for Brown Belt. Target: 60. Counts only on: Blue Belt and higher.\"",
+        "Black Belt tooltip text is exactly: \"Unique submissions for Black Belt. Target: 80. Counts only on: Blue Belt and higher.\""
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under frontend/src/components/ui (they must be composed/used via props and className rather than modified).",
-    "Apply visual changes ONLY to the user-specified elements in the header, selected dashboard tabs, and the welcome/login page elements listed by the user.",
-    "All user-facing text must remain in English."
+    "Use English for all user-facing text.",
+    "Do not edit files under frontend/src/components/ui (compose them instead)."
   ],
   "nonGoals": [
-    "No backend (Motoko) changes or schema changes.",
-    "No new pages, flows, or feature additions beyond the requested visual styling updates.",
-    "No changes to non-selected tabs or other buttons/components outside the explicitly listed targets."
+    "No changes to backend models or APIs.",
+    "No UI redesign beyond updating/confirming the exact tooltip copy."
   ],
   "imageRequirements": {
     "required": [],

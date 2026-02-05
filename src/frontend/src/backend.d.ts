@@ -68,6 +68,17 @@ export interface SubmissionLog {
     blueBelt: Array<SubmissionCount>;
     purpleBelt: Array<SubmissionCount>;
 }
+export type BeltStageHistory = Array<{
+    startTime: Time;
+    endTime?: Time;
+    submissionCounts: Array<SubmissionCount>;
+    beltLevel: BeltLevel;
+    trainingStats: {
+        hoursTrained: number;
+        sessionsCompleted: bigint;
+        uniqueTechniques: bigint;
+    };
+}>;
 export interface TrainingSession {
     id: string;
     duration: bigint;
@@ -182,11 +193,18 @@ export interface backendInterface {
     clearAllTrainingHours(): Promise<void>;
     clearTrainingHours(date: string): Promise<void>;
     deleteTrainingHours(date: string): Promise<void>;
+    endBeltStage(beltLevel: BeltLevel, endTime: Time, finalStats: {
+        hoursTrained: number;
+        sessionsCompleted: bigint;
+        uniqueTechniques: bigint;
+    }, finalSubmissions: Array<SubmissionCount>): Promise<void>;
     getAllBeltProgress(): Promise<Array<BeltProgress>>;
+    getAllBeltStageHistories(): Promise<Array<[Principal, BeltStageHistory]>>;
     getAllTechniques(): Promise<Array<Technique>>;
     getAllTrainingHours(): Promise<Array<TrainingHourRecord>>;
     getAllUsersTrainingHours(): Promise<Array<[Principal, Array<TrainingHourRecord>]>>;
     getBeltProgress(): Promise<BeltProgress | null>;
+    getBeltStageHistory(user: Principal): Promise<BeltStageHistory>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCustomTechniqueTypes(): Promise<Array<string>>;
@@ -216,11 +234,21 @@ export interface backendInterface {
     saveSubmissionLog(newLog: SubmissionLog): Promise<void>;
     saveTrainingRecords(trainingRecords: Array<TrainingSession>): Promise<void>;
     setTrainingHours(date: string, hours: number): Promise<void>;
+    startNewBeltStage(beltLevel: BeltLevel, startTime: Time, initialStats: {
+        hoursTrained: number;
+        sessionsCompleted: bigint;
+        uniqueTechniques: bigint;
+    }, initialSubmissions: Array<SubmissionCount>): Promise<void>;
     startProfileCreation(): Promise<{
         isDone: boolean;
         profile?: UserProfile;
     }>;
     updateBeltProgress(beltProgress: BeltProgress): Promise<void>;
+    updateBeltStage(beltLevel: BeltLevel, updatedStats: {
+        hoursTrained: number;
+        sessionsCompleted: bigint;
+        uniqueTechniques: bigint;
+    }, updatedSubmissions: Array<SubmissionCount>): Promise<void>;
     updateDashboardData(dashboardData: string): Promise<void>;
     updateThemePreference(theme: string): Promise<void>;
     updateTrainingHours(date: string, hours: number): Promise<void>;

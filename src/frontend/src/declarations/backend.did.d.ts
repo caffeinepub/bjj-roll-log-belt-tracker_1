@@ -25,6 +25,19 @@ export interface BeltProgress {
   'imageUrl' : string,
   'stripes' : bigint,
 }
+export type BeltStageHistory = Array<
+  {
+    'startTime' : Time,
+    'endTime' : [] | [Time],
+    'submissionCounts' : Array<SubmissionCount>,
+    'beltLevel' : BeltLevel,
+    'trainingStats' : {
+      'hoursTrained' : number,
+      'sessionsCompleted' : bigint,
+      'uniqueTechniques' : bigint,
+    },
+  }
+>;
 export interface CrossTrainingGoal {
   'id' : string,
   'completionDate' : [] | [Time],
@@ -198,7 +211,24 @@ export interface _SERVICE {
   'clearAllTrainingHours' : ActorMethod<[], undefined>,
   'clearTrainingHours' : ActorMethod<[string], undefined>,
   'deleteTrainingHours' : ActorMethod<[string], undefined>,
+  'endBeltStage' : ActorMethod<
+    [
+      BeltLevel,
+      Time,
+      {
+        'hoursTrained' : number,
+        'sessionsCompleted' : bigint,
+        'uniqueTechniques' : bigint,
+      },
+      Array<SubmissionCount>,
+    ],
+    undefined
+  >,
   'getAllBeltProgress' : ActorMethod<[], Array<BeltProgress>>,
+  'getAllBeltStageHistories' : ActorMethod<
+    [],
+    Array<[Principal, BeltStageHistory]>
+  >,
   'getAllTechniques' : ActorMethod<[], Array<Technique>>,
   'getAllTrainingHours' : ActorMethod<[], Array<TrainingHourRecord>>,
   'getAllUsersTrainingHours' : ActorMethod<
@@ -206,6 +236,7 @@ export interface _SERVICE {
     Array<[Principal, Array<TrainingHourRecord>]>
   >,
   'getBeltProgress' : ActorMethod<[], [] | [BeltProgress]>,
+  'getBeltStageHistory' : ActorMethod<[Principal], BeltStageHistory>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getCustomTechniqueTypes' : ActorMethod<[], Array<string>>,
@@ -249,11 +280,36 @@ export interface _SERVICE {
   'saveSubmissionLog' : ActorMethod<[SubmissionLog], undefined>,
   'saveTrainingRecords' : ActorMethod<[Array<TrainingSession>], undefined>,
   'setTrainingHours' : ActorMethod<[string, number], undefined>,
+  'startNewBeltStage' : ActorMethod<
+    [
+      BeltLevel,
+      Time,
+      {
+        'hoursTrained' : number,
+        'sessionsCompleted' : bigint,
+        'uniqueTechniques' : bigint,
+      },
+      Array<SubmissionCount>,
+    ],
+    undefined
+  >,
   'startProfileCreation' : ActorMethod<
     [],
     { 'isDone' : boolean, 'profile' : [] | [UserProfile] }
   >,
   'updateBeltProgress' : ActorMethod<[BeltProgress], undefined>,
+  'updateBeltStage' : ActorMethod<
+    [
+      BeltLevel,
+      {
+        'hoursTrained' : number,
+        'sessionsCompleted' : bigint,
+        'uniqueTechniques' : bigint,
+      },
+      Array<SubmissionCount>,
+    ],
+    undefined
+  >,
   'updateDashboardData' : ActorMethod<[string], undefined>,
   'updateThemePreference' : ActorMethod<[string], undefined>,
   'updateTrainingHours' : ActorMethod<[string, number], undefined>,

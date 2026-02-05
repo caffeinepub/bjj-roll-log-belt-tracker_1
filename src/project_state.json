@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 39,
-  "summary": "Jiu-Jitsu Journey is an Internet Computer (ICP) dapp for Brazilian Jiu-Jitsu practitioners. Users authenticate with Internet Identity, create and edit a profile (belt/stripes, optional avatar, gym info, practitioner-since date), log and edit training sessions (date, duration, gi/no-gi, theme, intensity, rolls, mood), track belt progression with client-side gamified stats, maintain a multi-belt submission log (submissions landed vs opponent belt), build a personal technique library, and visualize activity via a month calendar, analytics charts, and GitHub-style yearly heat maps (including an editable training-hours override heat map). The backend is a Motoko canister with RBAC plus optional Caffeine blob-storage maintenance/cycles refill endpoints.",
+  "projectStateVersion": 66,
+  "summary": "Jiu-Jitsu Journey scope expanded significantly beyond the initial BJJ log: iterative refactors focused on reliable ICP actor/auth/profile initialization (no hangs), improved profile editing UX, revamped Training Log into a month calendar + right-side details, enhanced analytics (6 metrics each for Profile Analytics + Training Log), multiple heat map iterations with year/month/day alignment fixes, expanded session fields (intensity, mood), redesigned Submission Log UI/behavior (per-opponent-belt logging, searchable dropdown, unique-per-belt enforcement, compact tags), gamified belt progression bars with per-belt reset rules, and broader UI polish (responsive layouts, gradient glow theme accents).",
   "existing_features": [
     {
       "id": "IF-1",
@@ -475,34 +475,10 @@
       "version": 1
     },
     {
-      "id": "feature-implement-an-animated-google-lens-style-multicolor-gradient-glow-highlight-blue-green-yellow-red-tones-that-works-in-both-light-and-dark-themes-and-expose-it-as-reusable-styling-tailwind-utilities-and-or-css-utility-classes-so-it-can-be-applied-consistently-to-the-specified-ui-elements-only",
-      "title": "Implement an animated, Google Lens-style multicolor gradient glow highlight (blue → green → yellow → red tones) that works in both light and dark themes, and expose it as reusable styling (Tailwind utilities and/or CSS utility classes) so it can be applied consistently to the specified UI elements only.",
+      "id": "feature-provide-the-exact-final-english-tooltip-text-for-the-submission-proficiency-unique-submissions-tooltip-for-each-belt-white-blue-purple-brown-black-using-the-format-unique-submissions-for-current-belt-target-target-for-belt-counts-only-on-blue-belt-and-higher-and-using-the-app-s-existing-per-belt-numeric-targets-white-5-blue-25-purple-40-brown-60-black-80",
+      "title": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
       "reqIds": [
         "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-header-branding-area-to-use-the-animated-google-lens-style-gradient-glow-styling-only-for-a-the-jiu-jitsu-journey-name-text-and-b-the-profile-button-desktop-profile-button-in-the-header-do-not-apply-the-new-glow-styling-to-other-header-controls-theme-toggle-logout-etc",
-      "title": "Update the header branding area to use the animated Google Lens-style gradient glow styling ONLY for: (a) the “Jiu-Jitsu Journey” name text, and (b) the Profile button (desktop profile button in the header). Do not apply the new glow styling to other header controls (theme toggle, logout, etc.).",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-dashboard-tab-navigation-so-that-only-the-selected-tab-buttons-profile-analytics-training-log-belt-tracker-techniques-use-the-animated-google-lens-style-multicolor-gradient-as-the-entire-button-background-in-both-light-and-dark-themes-non-selected-tabs-must-keep-their-current-styling-no-multicolor-gradient-background",
-      "title": "Update the dashboard tab navigation so that ONLY the selected tab buttons (Profile Analytics, Training Log, Belt Tracker, Techniques) use the animated Google Lens-style multicolor gradient as the entire button background, in both light and dark themes. Non-selected tabs must keep their current styling (no multicolor gradient background).",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-welcome-login-page-to-apply-the-animated-google-lens-style-multicolor-gradient-glow-styling-only-to-a-the-bjj-icon-at-the-top-of-the-page-b-the-login-with-internet-identity-button-and-c-the-four-rounded-areas-on-the-welcome-page-the-rounded-info-panel-inside-the-welcome-card-and-the-three-rounded-feature-tiles-ensure-the-page-remains-readable-and-accessible-in-both-light-and-dark-themes",
-      "title": "Update the welcome/login page to apply the animated Google Lens-style multicolor gradient glow styling ONLY to: (a) the BJJ icon at the top of the page, (b) the “Login with Internet Identity” button, and (c) the four rounded areas on the welcome page (the rounded info panel inside the Welcome card and the three rounded feature tiles). Ensure the page remains readable and accessible in both light and dark themes.",
-      "reqIds": [
-        "REQ-4"
       ],
       "version": 1
     }
@@ -511,6 +487,60 @@
     {
       "id": "AR-1",
       "summary": "Add modern sleek multi-colored “Google Lens-style” gradient glow highlights to specific UI elements (header title/profile button, selected tabs, and welcome page icon/sign-in button/4 rounded areas)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Optimize responsive layout: keep the two selected areas within the parent container and allow their content to wrap to new lines when it can’t fit (no overflow)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Update the submission stats tooltip copy to: “Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.” (shown for each belt)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Stabilize startup flow: strict Internet Identity → identity → authenticated actor → profile fetch/create sequence with robust fallback (no infinite “Connecting/Loading profile”), plus optional debug overlay/logging to diagnose actor/profile states.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Revamp Training Log UI: replace long session list with a visually appealing month calendar (Gi/No-Gi styling, mood/intensity/roll indicators) and a right-hand month session details panel; support clicking a day to jump/scroll to details entry.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Training Heat Map in Profile Analytics: year-selectable GitHub-style heat map with Monday→Sunday rows, correct UTC/local mapping alignment, month label anchoring to month start column, selection reset on year change, responsive horizontal scroll for small screens, and theme-aware empty-cell colors.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Enhance Log Training Session fields: add Intensity dropdown (Recovery/Flow, Light, Moderate default, Hard, Max/Comp), ensure Open Mat is supported end-to-end (frontend + backend SessionTheme), and ensure session saves include current belt/stripe snapshot.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Redesign Submission Log: standalone section below Recent Sessions with belt-aligned searchable dropdowns, per-opponent-belt selection, unique-per-belt enforcement (case-insensitive), compact tags (max 5 with expand), auto-save when already saved, and ability to filter/view by opponent belt.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Gamified Belt Progression Stats: add bars for Progression/Experience/Submission Proficiency/Technique Mastery with tooltips; per-belt resets (including white belt target); ensure next belt visuals and badges match desired locked/faded rules; keep update belt/stripes controls on one row on all screen sizes.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Profile/Technique UX polish: ensure profile picture + gym favicon/logo persist and cache like belts; Profile Setup includes cancel while editing; improve Practitioner Since year selector usability; Add Technique type dropdown uses hardcoded submission list with 5-item visible limit + scroll.",
       "reqIds": [],
       "status": "pending"
     }
@@ -535,9 +565,11 @@
     "Some React Query hooks swallow errors and return empty defaults ([], null), which can mask authorization/config issues unless console logs are inspected.",
     "There are two global Tailwind/CSS files (frontend/index.css and frontend/src/index.css); only src/index.css is imported, but duplication can cause confusion about the authoritative style source.",
     "Local-midnight timestamp strategy can still produce edge-case date bucketing issues around DST transitions in some timezones.",
-    "Some content IDs load (e.g., 150xlr4, 19sngkx) while others (e.g., lf4nkz) fail and/or their images do not render; investigate ID-based routing/asset retrieval and image loading logic."
+    "Some content IDs load (e.g., 150xlr4, 19sngkx) while others (e.g., lf4nkz) fail and/or their images do not render; investigate ID-based routing/asset retrieval and image loading logic.",
+    "Draft deployments frequently hit IC0508 Reject code 5 “Canister is stopped” (cycles/stop/half-upgrade); requires redeploy/new draft; should minimize init/postupgrade traps and reduce reliance on manual init endpoints.",
+    "Mood PNGs often fail to render due to asset-path/filename case mismatches and differing expected directories (/assets/generated vs /assets/moods); belts load because their paths match exactly."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "gameProjectType": "none",
   "projectName": "Jiu-Jitsu Journey",
   "clarification_mode": "thinking",

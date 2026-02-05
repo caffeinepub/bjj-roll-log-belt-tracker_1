@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useGetCallerUserProfile, useUpdateBeltProgress, useGetTrainingRecords, useGetSubmissionLog } from '../hooks/useQueries';
+import { useGetCallerUserProfile, useUpdateBeltProgress, useGetTrainingRecords, useGetSubmissionLog, useGetBeltStageHistory } from '../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +10,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import type { BeltProgress, SubmissionLog } from '../backend';
 import { getBeltImageUrl, getBeltName, preloadAllBeltImages } from '../lib/beltUtils';
 import { calculateBeltGamifiedStats } from '../lib/beltStatsCalculator';
+import { getSubmissionProficiencyTooltip } from '../lib/submissionProficiencyTooltipCopy';
+import CompletedBeltStageStatsCard from './CompletedBeltStageStatsCard';
 import { Loader2, Award, Lock, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +41,7 @@ export default function BeltTracker() {
   const { data: userProfile, isLoading } = useGetCallerUserProfile();
   const { data: trainingSessions = [], isLoading: sessionsLoading } = useGetTrainingRecords();
   const { data: submissionLog, isLoading: submissionLoading } = useGetSubmissionLog();
+  const { data: beltStageHistory = [], isLoading: historyLoading } = useGetBeltStageHistory();
   const updateBeltMutation = useUpdateBeltProgress();
 
   const [selectedBelt, setSelectedBelt] = useState<BeltLevel | null>(null);
@@ -49,7 +52,7 @@ export default function BeltTracker() {
     preloadAllBeltImages();
   }, []);
 
-  // Calculate gamified stats
+  // Calculate gamified stats for current belt
   const gamifiedStats = useMemo(() => {
     if (!userProfile || !submissionLog) return null;
     
@@ -66,9 +69,117 @@ export default function BeltTracker() {
       userProfile.beltProgress.belt as BeltLevel,
       Number(userProfile.beltProgress.stripes),
       trainingSessions,
-      fullSubmissionLog
+      fullSubmissionLog,
+      beltStageHistory
     );
-  }, [userProfile, trainingSessions, submissionLog]);
+  }, [userProfile, trainingSessions, submissionLog, beltStageHistory]);
+
+  // Find the most recently completed belt stage
+  const completedBeltStage = useMemo(() => {
+    if (!beltStageHistory || beltStageHistory.length === 0) return null;
+    
+    // Find all completed stages (those with endTime)
+    const completedStages = beltStageHistory.filter((stage) => stage.endTime);
+    
+    if (completedStages.length === 0) return null;
+    
+    // Sort by endTime descending and take the most recent
+    const sorted = [...completedStages].sort((a, b) => {
+      const aEnd = Number(a.endTime || 0);
+      const bEnd = Number(b.endTime || 0);
+      return bEnd - aEnd;
+    });
+    
+    return sorted[0];
+  }, [beltStageHistory]);
+
+  // Calculate stats for the completed belt stage
+  const completedBeltStats = useMemo(() => {
+    if (!completedBeltStage || !submissionLog) return null;
+    
+    const beltLevel = completedBeltStage.beltLevel as BeltLevel;
+    const stageStartTime = Number(completedBeltStage.startTime);
+    const stageEndTime = Number(completedBeltStage.endTime || Date.now());
+    
+    // Filter sessions within the completed stage time window
+    const stageSessions = trainingSessions.filter((session) => {
+      const sessionTime = Number(session.date);
+      return sessionTime >= stageStartTime && sessionTime <= stageEndTime;
+    });
+    
+    // Use submission counts from the stage
+    const uniqueSubmissionCount = completedBeltStage.submissionCounts.length;
+    
+    // Calculate hours
+    const hoursAtBelt = stageSessions.reduce((total, session) => {
+      return total + Number(session.duration) / 60;
+    }, 0);
+    
+    // Calculate progression
+    const baseProgression = 100; // Completed belt is 100%
+    const milestones = [150, 300, 450, 600];
+    let milestoneBonus = 0;
+    for (const milestone of milestones) {
+      if (hoursAtBelt >= milestone) {
+        milestoneBonus += 5;
+      }
+    }
+    const progressionPercent = Math.min(100, baseProgression + milestoneBonus);
+    
+    // Calculate experience
+    const experiencePercent = Math.min(100, Math.pow(hoursAtBelt / 600, 0.6) * 100);
+    
+    // Calculate submission proficiency
+    const threshold = SUBMISSION_THRESHOLDS[beltLevel] || 0;
+    const submissionProficiencyPercent = threshold > 0 ? Math.min(100, (uniqueSubmissionCount / threshold) * 100) : 0;
+    
+    // Calculate technique mastery
+    const ALL_THEMES = [
+      'takedowns_standup', 'guardSystems', 'guardRetention', 'guardPassing',
+      'sweeps', 'pinsControl', 'backControl', 'escapes', 'submissions',
+      'legLocks', 'transitionsScrambles', 'turtleGame', 'openMat',
+    ];
+    
+    const themeCounts: Record<string, number> = {};
+    ALL_THEMES.forEach((theme) => {
+      themeCounts[theme] = 0;
+    });
+    
+    stageSessions.forEach((session) => {
+      const theme = session.sessionTheme;
+      themeCounts[theme] = (themeCounts[theme] || 0) + 1;
+    });
+    
+    let techniqueMasteryPercent = 0;
+    ALL_THEMES.forEach((theme) => {
+      const sessionCount = themeCounts[theme] || 0;
+      const themeProgress = Math.min(sessionCount / 20, 1.0) * (100 / 13);
+      techniqueMasteryPercent += themeProgress;
+    });
+    techniqueMasteryPercent = Math.min(100, techniqueMasteryPercent);
+    
+    return {
+      progressionPercent,
+      experiencePercent,
+      submissionProficiencyPercent,
+      techniqueMasteryPercent,
+      progressionRaw: {
+        stripes: 4, // Completed belt has 4 stripes
+        hours: hoursAtBelt,
+        milestoneBonus,
+      },
+      experienceRaw: {
+        hours: hoursAtBelt,
+      },
+      submissionsRaw: {
+        totalCount: uniqueSubmissionCount,
+      },
+      masteryRaw: {
+        totalSessions: stageSessions.length,
+        themeCounts,
+      },
+    };
+  }, [completedBeltStage, trainingSessions, submissionLog]);
 
   if (isLoading || !userProfile) {
     return (
@@ -125,7 +236,7 @@ export default function BeltTracker() {
     return SUBMISSION_THRESHOLDS[belt] || 0;
   };
 
-  const statsLoading = sessionsLoading || submissionLoading;
+  const statsLoading = sessionsLoading || submissionLoading || historyLoading;
 
   return (
     <div className="space-y-6">
@@ -293,7 +404,7 @@ export default function BeltTracker() {
                             </TooltipTrigger>
                             <TooltipContent>
                               <p className="max-w-xs">
-                                Unique submissions for {getBeltName(currentBelt)}. Target: {getSubmissionThreshold(currentBelt)}.
+                                {getSubmissionProficiencyTooltip(currentBelt)}
                               </p>
                             </TooltipContent>
                           </Tooltip>
@@ -396,6 +507,16 @@ export default function BeltTracker() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Completed Belt Stage Stats */}
+      {completedBeltStage && completedBeltStats && (
+        <CompletedBeltStageStatsCard
+          beltLevel={completedBeltStage.beltLevel as BeltLevel}
+          beltName={getBeltName(completedBeltStage.beltLevel as BeltLevel)}
+          stats={completedBeltStats}
+          submissionThreshold={getSubmissionThreshold(completedBeltStage.beltLevel as BeltLevel)}
+        />
+      )}
     </div>
   );
 }

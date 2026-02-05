@@ -142,6 +142,19 @@ export const SubmissionCount = IDL.Record({
   'name' : IDL.Text,
   'count' : IDL.Nat,
 });
+export const BeltStageHistory = IDL.Vec(
+  IDL.Record({
+    'startTime' : Time,
+    'endTime' : IDL.Opt(Time),
+    'submissionCounts' : IDL.Vec(SubmissionCount),
+    'beltLevel' : BeltLevel,
+    'trainingStats' : IDL.Record({
+      'hoursTrained' : IDL.Float64,
+      'sessionsCompleted' : IDL.Nat,
+      'uniqueTechniques' : IDL.Nat,
+    }),
+  })
+);
 export const SubmissionLog = IDL.Record({
   'blackBelt' : IDL.Vec(SubmissionCount),
   'whiteBelt' : IDL.Vec(SubmissionCount),
@@ -221,7 +234,26 @@ export const idlService = IDL.Service({
   'clearAllTrainingHours' : IDL.Func([], [], []),
   'clearTrainingHours' : IDL.Func([IDL.Text], [], []),
   'deleteTrainingHours' : IDL.Func([IDL.Text], [], []),
+  'endBeltStage' : IDL.Func(
+      [
+        BeltLevel,
+        Time,
+        IDL.Record({
+          'hoursTrained' : IDL.Float64,
+          'sessionsCompleted' : IDL.Nat,
+          'uniqueTechniques' : IDL.Nat,
+        }),
+        IDL.Vec(SubmissionCount),
+      ],
+      [],
+      [],
+    ),
   'getAllBeltProgress' : IDL.Func([], [IDL.Vec(BeltProgress)], ['query']),
+  'getAllBeltStageHistories' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Principal, BeltStageHistory))],
+      ['query'],
+    ),
   'getAllTechniques' : IDL.Func([], [IDL.Vec(Technique)], ['query']),
   'getAllTrainingHours' : IDL.Func(
       [],
@@ -234,6 +266,11 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getBeltProgress' : IDL.Func([], [IDL.Opt(BeltProgress)], ['query']),
+  'getBeltStageHistory' : IDL.Func(
+      [IDL.Principal],
+      [BeltStageHistory],
+      ['query'],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCustomTechniqueTypes' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
@@ -291,12 +328,39 @@ export const idlService = IDL.Service({
   'saveSubmissionLog' : IDL.Func([SubmissionLog], [], []),
   'saveTrainingRecords' : IDL.Func([IDL.Vec(TrainingSession)], [], []),
   'setTrainingHours' : IDL.Func([IDL.Text, IDL.Float64], [], []),
+  'startNewBeltStage' : IDL.Func(
+      [
+        BeltLevel,
+        Time,
+        IDL.Record({
+          'hoursTrained' : IDL.Float64,
+          'sessionsCompleted' : IDL.Nat,
+          'uniqueTechniques' : IDL.Nat,
+        }),
+        IDL.Vec(SubmissionCount),
+      ],
+      [],
+      [],
+    ),
   'startProfileCreation' : IDL.Func(
       [],
       [IDL.Record({ 'isDone' : IDL.Bool, 'profile' : IDL.Opt(UserProfile) })],
       ['query'],
     ),
   'updateBeltProgress' : IDL.Func([BeltProgress], [], []),
+  'updateBeltStage' : IDL.Func(
+      [
+        BeltLevel,
+        IDL.Record({
+          'hoursTrained' : IDL.Float64,
+          'sessionsCompleted' : IDL.Nat,
+          'uniqueTechniques' : IDL.Nat,
+        }),
+        IDL.Vec(SubmissionCount),
+      ],
+      [],
+      [],
+    ),
   'updateDashboardData' : IDL.Func([IDL.Text], [], []),
   'updateThemePreference' : IDL.Func([IDL.Text], [], []),
   'updateTrainingHours' : IDL.Func([IDL.Text, IDL.Float64], [], []),
@@ -436,6 +500,19 @@ export const idlFactory = ({ IDL }) => {
     'trainingGoals' : IDL.Vec(TrainingGoal),
   });
   const SubmissionCount = IDL.Record({ 'name' : IDL.Text, 'count' : IDL.Nat });
+  const BeltStageHistory = IDL.Vec(
+    IDL.Record({
+      'startTime' : Time,
+      'endTime' : IDL.Opt(Time),
+      'submissionCounts' : IDL.Vec(SubmissionCount),
+      'beltLevel' : BeltLevel,
+      'trainingStats' : IDL.Record({
+        'hoursTrained' : IDL.Float64,
+        'sessionsCompleted' : IDL.Nat,
+        'uniqueTechniques' : IDL.Nat,
+      }),
+    })
+  );
   const SubmissionLog = IDL.Record({
     'blackBelt' : IDL.Vec(SubmissionCount),
     'whiteBelt' : IDL.Vec(SubmissionCount),
@@ -519,7 +596,26 @@ export const idlFactory = ({ IDL }) => {
     'clearAllTrainingHours' : IDL.Func([], [], []),
     'clearTrainingHours' : IDL.Func([IDL.Text], [], []),
     'deleteTrainingHours' : IDL.Func([IDL.Text], [], []),
+    'endBeltStage' : IDL.Func(
+        [
+          BeltLevel,
+          Time,
+          IDL.Record({
+            'hoursTrained' : IDL.Float64,
+            'sessionsCompleted' : IDL.Nat,
+            'uniqueTechniques' : IDL.Nat,
+          }),
+          IDL.Vec(SubmissionCount),
+        ],
+        [],
+        [],
+      ),
     'getAllBeltProgress' : IDL.Func([], [IDL.Vec(BeltProgress)], ['query']),
+    'getAllBeltStageHistories' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, BeltStageHistory))],
+        ['query'],
+      ),
     'getAllTechniques' : IDL.Func([], [IDL.Vec(Technique)], ['query']),
     'getAllTrainingHours' : IDL.Func(
         [],
@@ -532,6 +628,11 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getBeltProgress' : IDL.Func([], [IDL.Opt(BeltProgress)], ['query']),
+    'getBeltStageHistory' : IDL.Func(
+        [IDL.Principal],
+        [BeltStageHistory],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCustomTechniqueTypes' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
@@ -593,12 +694,39 @@ export const idlFactory = ({ IDL }) => {
     'saveSubmissionLog' : IDL.Func([SubmissionLog], [], []),
     'saveTrainingRecords' : IDL.Func([IDL.Vec(TrainingSession)], [], []),
     'setTrainingHours' : IDL.Func([IDL.Text, IDL.Float64], [], []),
+    'startNewBeltStage' : IDL.Func(
+        [
+          BeltLevel,
+          Time,
+          IDL.Record({
+            'hoursTrained' : IDL.Float64,
+            'sessionsCompleted' : IDL.Nat,
+            'uniqueTechniques' : IDL.Nat,
+          }),
+          IDL.Vec(SubmissionCount),
+        ],
+        [],
+        [],
+      ),
     'startProfileCreation' : IDL.Func(
         [],
         [IDL.Record({ 'isDone' : IDL.Bool, 'profile' : IDL.Opt(UserProfile) })],
         ['query'],
       ),
     'updateBeltProgress' : IDL.Func([BeltProgress], [], []),
+    'updateBeltStage' : IDL.Func(
+        [
+          BeltLevel,
+          IDL.Record({
+            'hoursTrained' : IDL.Float64,
+            'sessionsCompleted' : IDL.Nat,
+            'uniqueTechniques' : IDL.Nat,
+          }),
+          IDL.Vec(SubmissionCount),
+        ],
+        [],
+        [],
+      ),
     'updateDashboardData' : IDL.Func([IDL.Text], [], []),
     'updateThemePreference' : IDL.Func([IDL.Text], [], []),
     'updateTrainingHours' : IDL.Func([IDL.Text, IDL.Float64], [], []),

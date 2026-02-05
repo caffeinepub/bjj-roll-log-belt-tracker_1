@@ -1,4 +1,3 @@
-// redeploy without any code changes
 import Map "mo:core/Map";
 import Array "mo:core/Array";
 import Float "mo:core/Float";
@@ -221,6 +220,18 @@ actor {
     #black;
   };
 
+  type BeltStageHistory = [{
+    beltLevel : BeltLevel;
+    startTime : Time.Time;
+    endTime : ?Time.Time;
+    trainingStats : {
+      hoursTrained : Float;
+      sessionsCompleted : Nat;
+      uniqueTechniques : Nat;
+    };
+    submissionCounts : [SubmissionCount];
+  }];
+
   var userProfiles = Map.empty<Principal, UserProfile>();
   var trainingSessions = Map.empty<Principal, Map.Map<Text, TrainingSession>>();
   var techniques = Map.empty<Principal, Map.Map<Text, Technique>>();
@@ -229,6 +240,7 @@ actor {
   var isProfileCreationDone : Map.Map<Principal, Bool> = Map.empty<Principal, Bool>();
   var trainingHours = Map.empty<Principal, Map.Map<Text, Float>>();
   var submissionLogs = Map.empty<Principal, SubmissionLog>();
+  var beltStageHistories = Map.empty<Principal, BeltStageHistory>();
 
   var accessControlState = AccessControl.initState();
 
@@ -994,5 +1006,125 @@ actor {
       };
     };
   };
-};
 
+  // New Belt Stage History Methods
+
+  public shared ({ caller }) func startNewBeltStage(
+    beltLevel : BeltLevel,
+    startTime : Time.Time,
+    initialStats : {
+      hoursTrained : Float;
+      sessionsCompleted : Nat;
+      uniqueTechniques : Nat;
+    },
+    initialSubmissions : [SubmissionCount],
+  ) : async () {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized: Only users can start a new belt stage");
+    };
+
+    let newStage = {
+      beltLevel;
+      startTime;
+      endTime = null;
+      trainingStats = initialStats;
+      submissionCounts = initialSubmissions;
+    };
+
+    let updatedHistory = switch (beltStageHistories.get(caller)) {
+      case (null) { [newStage] };
+      case (?history) { history.concat([newStage]) };
+    };
+
+    beltStageHistories.add(caller, updatedHistory);
+  };
+
+  public shared ({ caller }) func endBeltStage(
+    beltLevel : BeltLevel,
+    endTime : Time.Time,
+    finalStats : {
+      hoursTrained : Float;
+      sessionsCompleted : Nat;
+      uniqueTechniques : Nat;
+    },
+    finalSubmissions : [SubmissionCount],
+  ) : async () {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized: Only users can end a belt stage");
+    };
+
+    let updatedHistory = switch (beltStageHistories.get(caller)) {
+      case (null) { Runtime.trap("No belt stage history found for this user") };
+      case (?history) {
+        history.map(
+          func(stage) {
+            if (stage.beltLevel == beltLevel and stage.endTime == null) {
+              {
+                stage with
+                endTime = ?endTime;
+                trainingStats = finalStats;
+                submissionCounts = finalSubmissions;
+              };
+            } else {
+              stage;
+            };
+          }
+        );
+      };
+    };
+
+    beltStageHistories.add(caller, updatedHistory);
+  };
+
+  public query ({ caller }) func getBeltStageHistory(user : Principal) : async BeltStageHistory {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own belt stage history");
+    };
+    switch (beltStageHistories.get(user)) {
+      case (null) { [] };
+      case (?history) { history };
+    };
+  };
+
+  public query ({ caller }) func getAllBeltStageHistories() : async [(Principal, BeltStageHistory)] {
+    if (not AccessControl.hasPermission(accessControlState, caller, #admin)) {
+      Runtime.trap("Unauthorized: Only admins can access all belt stage histories");
+    };
+    beltStageHistories.toArray();
+  };
+
+  public shared ({ caller }) func updateBeltStage(
+    beltLevel : BeltLevel,
+    updatedStats : {
+      hoursTrained : Float;
+      sessionsCompleted : Nat;
+      uniqueTechniques : Nat;
+    },
+    updatedSubmissions : [SubmissionCount],
+  ) : async () {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized: Only users can update a belt stage");
+    };
+
+    let updatedHistory = switch (beltStageHistories.get(caller)) {
+      case (null) { Runtime.trap("No belt stage history found for this user") };
+      case (?history) {
+        history.map(
+          func(stage) {
+            if (stage.beltLevel == beltLevel and stage.endTime == null) {
+              {
+                stage with
+                trainingStats = updatedStats;
+                submissionCounts = updatedSubmissions;
+              };
+            } else {
+              stage;
+            };
+          }
+        );
+      };
+    };
+
+    beltStageHistories.add(caller, updatedHistory);
+  };
+};

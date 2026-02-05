@@ -206,14 +206,14 @@ export default function SubmissionLogSection() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-3">
-          {/* Belt Selector and Add Submission on same row */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+          {/* Belt Selector and Add Submission on same row with wrapping */}
+          <div className="flex flex-wrap items-start gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <label className="text-sm font-medium text-muted-foreground whitespace-nowrap shrink-0">
                 Opponent Belt:
               </label>
               <Select value={selectedBelt} onValueChange={(value) => setSelectedBelt(value as BeltLevel)}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[160px] sm:w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -228,7 +228,7 @@ export default function SubmissionLogSection() {
               </Select>
             </div>
 
-            <div className="flex-1 w-full sm:w-auto">
+            <div className="flex-1 min-w-[200px] w-full sm:w-auto">
               <SubmissionSelectInput
                 beltLabel={label}
                 submissions={submissions}

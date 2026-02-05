@@ -2,10 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-implement-an-animated-google-lens-style-multicolor-gradient-glow-highlight-blue-green-yellow-red-tones-that-works-in-both-light-and-dark-themes-and-expose-it-as-reusable-styling-tailwind-utilities-and-or-css-utility-classes-so-it-can-be-applied-consistently-to-the-specified-ui-elements-only",
-      "featureTitle": "Implement an animated, Google Lens-style multicolor gradient glow highlight (blue → green → yellow → red tones) that works in both light and dark themes, and expose it as reusable styling (Tailwind utilities and/or CSS utility classes) so it can be applied consistently to the specified UI elements only.",
+      "featureId": "feature-provide-the-exact-final-english-tooltip-text-for-the-submission-proficiency-unique-submissions-tooltip-for-each-belt-white-blue-purple-brown-black-using-the-format-unique-submissions-for-current-belt-target-target-for-belt-counts-only-on-blue-belt-and-higher-and-using-the-app-s-existing-per-belt-numeric-targets-white-5-blue-25-purple-40-brown-60-black-80",
+      "featureTitle": "Provide the exact, final English tooltip text for the Submission Proficiency / unique-submissions tooltip for each belt (White, Blue, Purple, Brown, Black), using the format: \"Unique submissions for *current belt*. Target: *target for belt*. Counts only on: Blue Belt and higher.\" and using the app’s existing per-belt numeric targets (white=5, blue=25, purple=40, brown=60, black=80).",
       "files": [
-        "frontend/src/index.css"
+        "frontend/src/components/BeltTracker.tsx",
+        "frontend/src/components/CompletedBeltStageStatsCard.tsx",
+        "frontend/src/lib/submissionProficiencyTooltipCopy.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,67 +20,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-header-branding-area-to-use-the-animated-google-lens-style-gradient-glow-styling-only-for-a-the-jiu-jitsu-journey-name-text-and-b-the-profile-button-desktop-profile-button-in-the-header-do-not-apply-the-new-glow-styling-to-other-header-controls-theme-toggle-logout-etc",
-      "featureTitle": "Update the header branding area to use the animated Google Lens-style gradient glow styling ONLY for: (a) the “Jiu-Jitsu Journey” name text, and (b) the Profile button (desktop profile button in the header). Do not apply the new glow styling to other header controls (theme toggle, logout, etc.).",
-      "files": [
-        "frontend/src/components/Header.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-dashboard-tab-navigation-so-that-only-the-selected-tab-buttons-profile-analytics-training-log-belt-tracker-techniques-use-the-animated-google-lens-style-multicolor-gradient-as-the-entire-button-background-in-both-light-and-dark-themes-non-selected-tabs-must-keep-their-current-styling-no-multicolor-gradient-background",
-      "featureTitle": "Update the dashboard tab navigation so that ONLY the selected tab buttons (Profile Analytics, Training Log, Belt Tracker, Techniques) use the animated Google Lens-style multicolor gradient as the entire button background, in both light and dark themes. Non-selected tabs must keep their current styling (no multicolor gradient background).",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-welcome-login-page-to-apply-the-animated-google-lens-style-multicolor-gradient-glow-styling-only-to-a-the-bjj-icon-at-the-top-of-the-page-b-the-login-with-internet-identity-button-and-c-the-four-rounded-areas-on-the-welcome-page-the-rounded-info-panel-inside-the-welcome-card-and-the-three-rounded-feature-tiles-ensure-the-page-remains-readable-and-accessible-in-both-light-and-dark-themes",
-      "featureTitle": "Update the welcome/login page to apply the animated Google Lens-style multicolor gradient glow styling ONLY to: (a) the BJJ icon at the top of the page, (b) the “Login with Internet Identity” button, and (c) the four rounded areas on the welcome page (the rounded info panel inside the Welcome card and the three rounded feature tiles). Ensure the page remains readable and accessible in both light and dark themes.",
-      "files": [
-        "frontend/src/components/LoginScreen.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "blob-storage@4.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
       ],
       "confidence": "high"
     }
